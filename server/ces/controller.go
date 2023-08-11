@@ -11,9 +11,14 @@ func GetCE(c echo.Context) error {
 	id := c.Param("id")
 	ce, err := GetCEById(id)
 	if err != nil {
+
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	return c.JSON(http.StatusOK, ce)
+	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
+		"name": "HOME",
+		"msg":  ce.Title,
+	})
+	// return c.JSON(http.StatusOK, ce)
 }
 
 func CreateCE(c echo.Context) error {
