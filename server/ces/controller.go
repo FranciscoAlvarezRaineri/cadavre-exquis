@@ -11,14 +11,11 @@ func GetCE(c echo.Context) error {
 	id := c.Param("id")
 	ce, err := GetCEById(id)
 	if err != nil {
-
-		return c.JSON(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, "Not a valid id.")
 	}
-	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
-		"name": "HOME",
-		"msg":  ce.Title,
+	return c.Render(http.StatusOK, "title.html", map[string]interface{}{
+		"msg": ce.Title,
 	})
-	// return c.JSON(http.StatusOK, ce)
 }
 
 func CreateCE(c echo.Context) error {
@@ -70,7 +67,10 @@ func CreateCE(c echo.Context) error {
 func ContributeToCE(c echo.Context) error {
 	id := c.Param("id")
 
-	Text := c.QueryParam("text")
+	Text := c.FormValue("text")
+	if Text == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Text can't be empty.")
+	}
 
 	contribution := Contribution{
 		Uid:      "123456",
@@ -80,12 +80,15 @@ func ContributeToCE(c echo.Context) error {
 
 	oldCE, err := GetCEById(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, "Not a valid id.")
 	}
 
 	newCE, err := UpdateCE(oldCE, contribution, id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
-	return c.JSON(http.StatusOK, newCE)
+
+	return c.Render(http.StatusOK, "contribution.html", map[string]interface{}{
+		"title": newCE.Title,
+	})
 }

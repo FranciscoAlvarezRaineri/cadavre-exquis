@@ -1,11 +1,18 @@
-{{define "index.html"}}
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <title>Boatswain Blog | {{index . "name"}}</title>
-    </head>
-    <body>
-      <h1>{{index . "msg"}}</h1>
-    </body>
-  </html>
-{{end}}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>cadavre exquis</title>
+    <script src="/public/htmx.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="/public/firebase.js" defer></script>
+  </head>
+  <body class="bg-neutral-800 text-neutral-200">
+    <header class="container flex items-center justify-around">
+      <div hx-get="/home" hx-target="#main">HOME</div>
+      <div>
+        <button hx-get="/user"  hx-target="#main">SIGNIN</button>
+      </div>
+    </header>
+    <main id="main" hx-trigger="load" hx-get="/home"></main>
+  </body>
+</html>

@@ -2,7 +2,6 @@ package ces
 
 import (
 	"cadavre-exquis/firebase/firestore"
-	"log"
 )
 
 func CreateNewCE(
@@ -26,18 +25,18 @@ func GetCEById(id string) (*CE, error) {
 	}
 	result := &CE{}
 	dsnap.DataTo(result)
+	result.ID = dsnap.Ref.ID
 	return result, nil
 }
 
 func UpdateCE(ce *CE, contribution Contribution, id string) (*CE, error) {
 	ce.Contributions = append(ce.Contributions, contribution)
 	ce.Reveal = contribution.Text[len(contribution.Text)-ce.RevealAmount:]
-
-	dsnap, result, err := firestore.SetDocInCol("ces", id, ce)
+	dsnap, _, err := firestore.SetDocInCol("ces", id, ce)
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("CE updated succesfully: %v", result)
+
 	updatedCE := &CE{}
 	dsnap.DataTo(updatedCE)
 	return updatedCE, nil

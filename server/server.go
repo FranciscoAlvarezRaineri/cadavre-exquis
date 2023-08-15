@@ -2,8 +2,8 @@ package main
 
 import (
 	"cadavre-exquis/firebase/firestore"
-	"cadavre-exquis/router"
 	"cadavre-exquis/render"
+	"cadavre-exquis/router"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -16,6 +16,8 @@ func main() {
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "method=${method}, uri=${uri}, status=${status}\n",
 	}))
+
+	e.Static("/public", "public")
 
 	e.Renderer = render.TemplateRenderer
 

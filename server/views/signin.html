@@ -1,0 +1,31 @@
+<div class="container flex flex-col items-center justify-center" id="content">
+  <form id="form" class="container flex flex-col justify-center">
+    <label>
+      email:
+      <input
+        type="text"
+        name="email"
+        autocomplete="off"
+        class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+      />
+    </label>
+    <label>
+      password:
+      <input
+        type="password"
+        name="password"
+        autocomplete="off"
+        class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+      />
+    </label>
+    <button type="submit">SignIn</button>
+  </form>
+  <script>
+    form = document.getElementById("form");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = Object.fromEntries(new FormData(e.target));
+      signIn(formData.email, formData.password);
+    });
+  </script>
+</div>

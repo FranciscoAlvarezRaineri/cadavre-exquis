@@ -16,3 +16,4 @@ var TemplateRenderer = &Template{templates: template.Must(template.ParseGlob("vi
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	return t.templates.ExecuteTemplate(w, name, data)
 }
+

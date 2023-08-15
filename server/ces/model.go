@@ -7,6 +7,7 @@ type Contribution struct {
 }
 
 type CE struct {
+	ID              string         `firestore:"id,omitempty"`
 	Title           string         `firestore:"title,omitempty"`
 	Contributions   []Contribution `firestore:"contributions,omitempty"`
 	LengthLimit     int            `firestore:"length_limit,omitempty"`
