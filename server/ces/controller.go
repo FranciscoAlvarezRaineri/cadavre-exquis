@@ -1,94 +1,156 @@
 package ces
 
 import (
+	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 )
 
-func GetCE(c echo.Context) error {
+func GetCE(c *gin.Context) {
 	id := c.Param("id")
 	ce, err := GetCEById(id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Not a valid id.")
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
-	return c.Render(http.StatusOK, "title.html", map[string]interface{}{
+	c.HTML(http.StatusOK, "contribution.html", gin.H{
 		"msg": ce.Title,
 	})
 }
 
-func CreateCE(c echo.Context) error {
-	Title := c.QueryParam("title")
+func CreateCE(c *gin.Context) {
+	c.Request.ParseForm()
+	log.Printf("form: %v", c.Request.Form)
 
-	Text := c.QueryParam("text")
+	title := c.Request.FormValue("title")
 
-	LengthLimit, err := strconv.Atoi(c.QueryParam("length"))
+	text := c.Request.FormValue("text")
+
+	length, err := strconv.Atoi(c.Request.FormValue("length"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Not a valid length limit.")
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
-	CharactersLimit, err := strconv.Atoi(c.QueryParam("character-limit"))
+	characters_limit, err := strconv.Atoi(c.Request.FormValue("characters_limit"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Not a valid character limit.")
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
-	WordsLimit, err := strconv.Atoi(c.QueryParam("words-limit"))
+	words_limit, err := strconv.Atoi(c.Request.FormValue("words_limit"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Not a valid words limit.")
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
-	RevealAmount, err := strconv.Atoi(c.QueryParam("reveal-limit"))
+	reveal_amount, err := strconv.Atoi(c.Request.FormValue("reveal_amount"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Not a valid reveal limit.")
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	ce := CE{
-		Title:           Title,
-		LengthLimit:     LengthLimit,
-		CharactersLimit: CharactersLimit,
-		WordsLimit:      WordsLimit,
-		RevealAmount:    RevealAmount,
+		Title:           title,
+		Length:          length,
+		CharactersLimit: characters_limit,
+		WordsLimit:      words_limit,
+		RevealAmount:    reveal_amount,
 	}
 
 	contribution := Contribution{
 		Uid:      "123456",
 		UserName: "prueba",
-		Text:     Text,
+		Text:     text,
 	}
 
 	newCE, err := CreateNewCE(ce, contribution)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
-	return c.JSON(http.StatusOK, newCE)
+
+	c.HTML(http.StatusOK, "home.html", gin.H{
+		"id":     newCE.ID,
+		"reveal": newCE.Reveal,
+	})
 }
 
-func ContributeToCE(c echo.Context) error {
+func ContributeToCE(c *gin.Context) {
 	id := c.Param("id")
+	last_contribution, err := strconv.ParseBool(c.Query("last_contribution"))
+	if err != nil {
+		c.Error(err)
+		c.Next()
+		return
+	}
+	reveal_amount, err := strconv.Atoi(c.Query("reveal_amount"))
+	if err != nil {
+		c.Error(err)
+		c.Next()
+		return
+	}
 
-	Text := c.FormValue("text")
-	if Text == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "Text can't be empty.")
+	text := c.Request.FormValue("text")
+	if text == "" {
+		err := errors.New("text can't be empty")
+		c.Error(err)
+		c.Next()
+		return
 	}
 
 	contribution := Contribution{
 		Uid:      "123456",
 		UserName: "prueba",
-		Text:     Text,
+		Text:     text,
 	}
 
-	oldCE, err := GetCEById(id)
+	if len(text) < 4 {
+		err := fmt.Errorf("text is too short. it should be at least %v words long", reveal_amount)
+		c.Error(err)
+		c.Next()
+		return
+	}
+
+	result, err := UpdateCE(id, contribution, last_contribution, reveal_amount)
+	if err != nil || !result {
+		c.Error(err)
+		c.Next()
+		return
+	}
+
+	c.Set("texts", []string{})
+	c.Set("templ", "contribution_success.html")
+
+	if last_contribution {
+		ce, err := GetCEById(id)
+		if err != nil {
+			c.Error(err)
+			c.Next()
+			return
+		}
+		texts := getFullText(ce.Contributions)
+		c.Set("texts", texts)
+		c.Set("templ", "ce.html")
+	}
+
+	c.Next()
+}
+
+func GetRandomCE(c *gin.Context) {
+	ce, err := GetRandomPublicCE()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Not a valid id.")
+		c.Error(err)
+		c.Next()
+		return
 	}
 
-	newCE, err := UpdateCE(oldCE, contribution, id)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError)
-	}
+	c.Set("ce", ce)
+	c.Set("last_contribution", lastContribution(ce))
 
-	return c.Render(http.StatusOK, "contribution.html", map[string]interface{}{
-		"title": newCE.Title,
-	})
+	c.Next()
 }

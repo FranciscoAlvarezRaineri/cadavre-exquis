@@ -1,0 +1,68 @@
+<div class="container flex flex-col items-center justify-center" id="content">
+  <form id="form" class="container flex flex-col justify-center" hx-post="/ces" hx-target="#main">
+    <label>
+      title:
+      <input
+        type="text"
+        name="title"
+        autocomplete="off"
+        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+      />
+    </label>
+    <label>
+      first contribution:
+      <input
+        type="text"
+        name="text"
+        autocomplete="off"
+        required
+        class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+      />
+    </label>
+    <label>
+      length:
+      <input
+        type="number"
+        name="length"
+        value=12
+        autocomplete="off"
+        required
+        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+      />
+    </label>
+    <label>
+      words limit:
+      <input
+        type="number"
+        name="words_limit"
+        value=12
+        autocomplete="off"
+        required
+        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+      />
+    </label>
+    <label>
+      characters limit:
+      <input
+        type="number"
+        name="characters_limit"
+        value=120
+        autocomplete="off"
+        required
+        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+      />
+    </label>
+    <label>
+      reveal amount:
+      <input
+        type="number"
+        name="reveal_amount"
+        value=6
+        autocomplete="off"
+        required
+        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+      />
+    </label>
+    <button type="submit">SignIn</button>
+  </form>
+</div>

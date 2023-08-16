@@ -6,6 +6,7 @@
         type="text"
         name="email"
         autocomplete="off"
+        required
         class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
       />
     </label>
@@ -15,11 +16,13 @@
         type="password"
         name="password"
         autocomplete="off"
+        required
         class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
       />
     </label>
     <button type="submit">SignIn</button>
   </form>
+  <script type="module" src="/public/firebase.js"></script>
   <script>
     form = document.getElementById("form");
     form.addEventListener("submit", function (e) {

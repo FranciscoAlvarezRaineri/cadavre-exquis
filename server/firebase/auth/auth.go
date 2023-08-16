@@ -47,3 +47,7 @@ func GetUserByUID(uid string) (*User, error) {
 
 	return user, nil
 }
+
+func validateToken(idToken string) (*auth.Token, error) {
+	return client.VerifyIDToken(context.Context, idToken)
+}

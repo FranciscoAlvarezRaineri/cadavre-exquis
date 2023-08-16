@@ -1,0 +1,13 @@
+{{define "header"}}
+<header class="container flex items-center justify-around">
+  <div>
+    <button hx-get="/newce" hx-target="#main">NEW</button>
+  </div>
+  <div>
+    <button hx-get="/home" hx-target="#main">HOME</button>
+  </div>
+  <div>
+    <button hx-get="/user" hx-target="#main">SIGNIN</button>
+  </div>
+</header>
+{{end}}

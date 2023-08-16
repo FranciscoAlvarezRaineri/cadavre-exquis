@@ -3,14 +3,17 @@ package users
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 )
 
-func GetUser(c echo.Context) error {
+func GetUser(c *gin.Context) {
 	uid := c.Param("uid")
 	user, err := GetUserByUID(uid)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Not a valid UserID.")
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
-	return c.JSON(http.StatusOK, user)
+	c.HTML(http.StatusOK, "contribution.html", gin.H{
+		"msg": user.UID,
+	})
 }
