@@ -25,7 +25,7 @@ func main() {
 
 	router.Use(auth.AuthCheck)
 
-	router.GET("/", render.Index)
+	router.GET("/", func(c *gin.Context) { c.Redirect(302, "/home") })
 	router.GET("/home", ces.GetRandomCE, render.Home)
 	router.GET("/user", users.GetUser, render.User)
 
