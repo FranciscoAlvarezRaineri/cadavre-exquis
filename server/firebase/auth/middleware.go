@@ -1,21 +1,34 @@
 package auth
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
 
-func ValidateToken(c *gin.Context) {
+	"github.com/gin-gonic/gin"
+)
+
+func AuthCheck(c *gin.Context) {
 	idToken, err := c.Cookie("accessToken")
 	if err != nil {
-		c.Set("uid", "")
+		c.Error(err)
+		c.Set("user", "")
 		c.Next()
 		return
 	}
 	token, err := validateToken(idToken)
 	if err != nil {
+		c.Error(err)
 		c.Set("uid", "")
 		c.Next()
 		return
 	}
-	uid := token.UID
-	c.Set("uid", uid)
+	c.Set("uid", token.UID)
+	c.Next()
+}
+
+func AuthGuard(c *gin.Context) {
+	if len(c.Errors.Errors()) != 0 {
+		c.AbortWithError(http.StatusUnauthorized, c.Errors.Last())
+		return
+	}
 	c.Next()
 }

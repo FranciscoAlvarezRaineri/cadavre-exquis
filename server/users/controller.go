@@ -10,10 +10,11 @@ func GetUser(c *gin.Context) {
 	uid := c.Param("uid")
 	user, err := GetUserByUID(uid)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		c.Status(http.StatusBadRequest)
+		c.Next()
 		return
 	}
-	c.HTML(http.StatusOK, "contribution.html", gin.H{
-		"msg": user.UID,
-	})
+	c.Status(http.StatusOK)
+	c.Set("templ", "contribution.html")
+	c.Set("user", user)
 }

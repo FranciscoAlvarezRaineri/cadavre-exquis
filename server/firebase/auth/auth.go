@@ -12,8 +12,8 @@ var client = initAuth()
 
 type User struct {
 	UID      string
-	userName string
-	email    string
+	UserName string
+	Email    string
 }
 
 // var uid = "7YzaAOa0m2XYrPTi9pNCqe5hniY2"
@@ -40,10 +40,10 @@ func GetUserByUID(uid string) (*User, error) {
 
 	user := &User{}
 	user.UID = userRecord.UID
-	user.userName = userRecord.DisplayName
-	user.email = userRecord.Email
+	user.UserName = userRecord.DisplayName
+	user.Email = userRecord.Email
 
-	log.Printf("Successfully fetched user data: %v\n", user.email)
+	log.Printf("Successfully fetched user data: %v\n", user.Email)
 
 	return user, nil
 }

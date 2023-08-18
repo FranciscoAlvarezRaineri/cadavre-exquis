@@ -36,6 +36,8 @@ func Home(c *gin.Context) {
 }
 
 func User(c *gin.Context) {
+	// logic to check a user is logged in and serve him the corresponding info.
+
 	templ := "signin.html"
 	if c.GetHeader("HX-Request") != "true" {
 		templ = "index.html"
@@ -46,7 +48,7 @@ func User(c *gin.Context) {
 	})
 }
 
-func NewCE(c *gin.Context) {
+func NewCEForm(c *gin.Context) {
 	templ := "newce.html"
 	if c.GetHeader("HX-Request") != "true" {
 		templ = "index.html"
@@ -61,7 +63,7 @@ func ContributeToCE(c *gin.Context) {
 	err := c.Errors
 	if err != nil {
 		templ := "contribution_error.html"
-		c.HTML(http.StatusOK, templ, gin.H{
+		c.HTML(http.StatusInternalServerError, templ, gin.H{
 			"main": "/newce",
 			"msg":  err[0],
 		})
@@ -73,5 +75,16 @@ func ContributeToCE(c *gin.Context) {
 	c.HTML(http.StatusOK, templ, gin.H{
 		"main":  "/newce",
 		"texts": texts,
+	})
+}
+
+func CreateCE(c *gin.Context) {
+	// error handler
+
+	getCE, _ := c.Get("ce")
+	ce := getCE.(*ces.CE)
+	c.HTML(http.StatusOK, "home.html", gin.H{
+		"id":     ce.ID,
+		"reveal": ce.Reveal,
 	})
 }

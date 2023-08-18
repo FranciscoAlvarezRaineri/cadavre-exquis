@@ -1,9 +1,8 @@
 package ces
 
 import (
-	"errors"
+	"cadavre-exquis/users"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -14,45 +13,55 @@ func GetCE(c *gin.Context) {
 	id := c.Param("id")
 	ce, err := GetCEById(id)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		c.Status(http.StatusInternalServerError)
+		c.Next()
 		return
 	}
-	c.HTML(http.StatusOK, "contribution.html", gin.H{
-		"msg": ce.Title,
-	})
+
+	c.Status(http.StatusOK)
+	c.Set("ce", ce)
+	c.Next()
 }
 
 func CreateCE(c *gin.Context) {
-	c.Request.ParseForm()
-	log.Printf("form: %v", c.Request.Form)
-
 	title := c.Request.FormValue("title")
 
 	text := c.Request.FormValue("text")
 
 	length, err := strconv.Atoi(c.Request.FormValue("length"))
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
+		c.Error(err)
 	}
 
 	characters_limit, err := strconv.Atoi(c.Request.FormValue("characters_limit"))
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
+		c.Error(err)
 	}
 
 	words_limit, err := strconv.Atoi(c.Request.FormValue("words_limit"))
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
+		c.Error(err)
 	}
 
 	reveal_amount, err := strconv.Atoi(c.Request.FormValue("reveal_amount"))
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		c.Error(err)
+	}
+
+	if len(c.Errors.Errors()) != 0 {
+		c.Status(http.StatusBadRequest)
+		c.Next()
 		return
 	}
+
+	uid := c.GetString("uid")
+	user, err := users.GetUserByUID(uid)
+	if err != nil {
+		c.Error(err)
+		c.Next()
+		return
+	}
+	userName := user.UserName
 
 	ce := CE{
 		Title:           title,
@@ -63,57 +72,61 @@ func CreateCE(c *gin.Context) {
 	}
 
 	contribution := Contribution{
-		Uid:      "123456",
-		UserName: "prueba",
+		Uid:      uid, // username and uid should come from request!!!!!!!
+		UserName: userName,
 		Text:     text,
 	}
 
 	newCE, err := CreateNewCE(ce, contribution)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		c.Status(http.StatusInternalServerError)
+		c.Next()
 		return
 	}
 
-	c.HTML(http.StatusOK, "home.html", gin.H{
-		"id":     newCE.ID,
-		"reveal": newCE.Reveal,
-	})
+	c.Set("ce", newCE)
+	c.Set("templ", "home.html")
+	c.Next()
 }
 
 func ContributeToCE(c *gin.Context) {
 	id := c.Param("id")
+
 	last_contribution, err := strconv.ParseBool(c.Query("last_contribution"))
 	if err != nil {
 		c.Error(err)
+	}
+
+	reveal_amount, err := strconv.Atoi(c.Query("reveal_amount"))
+	if err != nil {
+		c.Error(err)
+	}
+
+	text := c.Request.FormValue("text")
+	if len(text) < reveal_amount {
+		err := fmt.Errorf("text is too short. it should be at least %v words long", reveal_amount)
+		c.Error(err)
+	}
+
+	if len(c.Errors.Errors()) != 0 {
+		c.Status(http.StatusBadRequest)
 		c.Next()
 		return
 	}
-	reveal_amount, err := strconv.Atoi(c.Query("reveal_amount"))
+
+	uid := c.GetString("uid")
+	user, err := users.GetUserByUID(uid)
 	if err != nil {
 		c.Error(err)
 		c.Next()
 		return
 	}
-
-	text := c.Request.FormValue("text")
-	if text == "" {
-		err := errors.New("text can't be empty")
-		c.Error(err)
-		c.Next()
-		return
-	}
+	userName := user.UserName
 
 	contribution := Contribution{
-		Uid:      "123456",
-		UserName: "prueba",
+		Uid:      uid, /// this data should come from request!!!!!!!!!!!!1
+		UserName: userName,
 		Text:     text,
-	}
-
-	if len(text) < 4 {
-		err := fmt.Errorf("text is too short. it should be at least %v words long", reveal_amount)
-		c.Error(err)
-		c.Next()
-		return
 	}
 
 	result, err := UpdateCE(id, contribution, last_contribution, reveal_amount)
