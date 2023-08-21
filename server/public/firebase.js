@@ -20,22 +20,25 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-const auth = getAuth();
-
-/*       createUserWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
-    // Signed in
-    const user = userCredential.user;
-    // ...
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // ..
-  }); */
+const auth = getAuth(app);
 
 function signIn(email, password) {
   signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      document.cookie = `accessToken=${user.accessToken}`;
+      
+      htmx.ajax("GET", '/home', '#main')
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // htmx.ajax("GET", '/home', '#main') should show error message
+    });
+}
+
+function signUp(email, password) {
+  createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
       document.cookie = `accessToken=${user.accessToken}`;
@@ -49,3 +52,4 @@ function signIn(email, password) {
 }
 
 window.signIn = signIn
+window.signUp = signUp

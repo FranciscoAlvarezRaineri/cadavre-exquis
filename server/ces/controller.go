@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,13 +14,20 @@ func GetCE(c *gin.Context) {
 	id := c.Param("id")
 	ce, err := GetCEById(id)
 	if err != nil {
-		c.Status(http.StatusInternalServerError)
-		c.Next()
+		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 
+	texts := getFullText(ce.Contributions)
+	result := gin.H{
+		"title": ce.Title,
+		"texts": texts,
+	}
+	templ := "ce.html"
+
 	c.Status(http.StatusOK)
-	c.Set("ce", ce)
+	c.Set("templ", templ)
+	c.Set("result", result)
 	c.Next()
 }
 
@@ -33,12 +41,12 @@ func CreateCE(c *gin.Context) {
 		c.Error(err)
 	}
 
-	characters_limit, err := strconv.Atoi(c.Request.FormValue("characters_limit"))
+	characters_max, err := strconv.Atoi(c.Request.FormValue("characters_max"))
 	if err != nil {
 		c.Error(err)
 	}
 
-	words_limit, err := strconv.Atoi(c.Request.FormValue("words_limit"))
+	words_min, err := strconv.Atoi(c.Request.FormValue("words_min"))
 	if err != nil {
 		c.Error(err)
 	}
@@ -55,24 +63,19 @@ func CreateCE(c *gin.Context) {
 	}
 
 	uid := c.GetString("uid")
-	user, err := users.GetUserByUID(uid)
-	if err != nil {
-		c.Error(err)
-		c.Next()
-		return
-	}
+	user := c.MustGet("user").(*users.User)
 	userName := user.UserName
 
 	ce := CE{
-		Title:           title,
-		Length:          length,
-		CharactersLimit: characters_limit,
-		WordsLimit:      words_limit,
-		RevealAmount:    reveal_amount,
+		Title:         title,
+		Length:        length,
+		CharactersMax: characters_max,
+		WordsMin:      words_min,
+		RevealAmount:  reveal_amount,
 	}
 
 	contribution := Contribution{
-		Uid:      uid, // username and uid should come from request!!!!!!!
+		Uid:      uid,
 		UserName: userName,
 		Text:     text,
 	}
@@ -84,15 +87,33 @@ func CreateCE(c *gin.Context) {
 		return
 	}
 
-	c.Set("ce", newCE)
-	c.Set("templ", "home.html")
+	ceRef := users.CERef{
+		ID:     newCE.ID,
+		Title:  newCE.Title,
+		Reveal: newCE.Reveal,
+		Closed: newCE.Closed,
+	}
+
+	resultUser, err := users.ContributedTo(uid, ceRef)
+	if err != nil || !resultUser {
+		c.Error(err)
+		c.Next()
+		return
+	}
+
+	result := gin.H{}
+	templ := "create_success.html"
+
+	c.Status(http.StatusCreated)
+	c.Set("templ", templ)
+	c.Set("result", result)
 	c.Next()
 }
 
 func ContributeToCE(c *gin.Context) {
 	id := c.Param("id")
 
-	last_contribution, err := strconv.ParseBool(c.Query("last_contribution"))
+	closed, err := strconv.ParseBool(c.Query("last_contribution"))
 	if err != nil {
 		c.Error(err)
 	}
@@ -103,7 +124,7 @@ func ContributeToCE(c *gin.Context) {
 	}
 
 	text := c.Request.FormValue("text")
-	if len(text) < reveal_amount {
+	if len(strings.Split(text, " ")) < reveal_amount {
 		err := fmt.Errorf("text is too short. it should be at least %v words long", reveal_amount)
 		c.Error(err)
 	}
@@ -115,55 +136,104 @@ func ContributeToCE(c *gin.Context) {
 	}
 
 	uid := c.GetString("uid")
-	user, err := users.GetUserByUID(uid)
-	if err != nil {
-		c.Error(err)
-		c.Next()
-		return
-	}
+	user := c.MustGet("user").(*users.User)
 	userName := user.UserName
 
 	contribution := Contribution{
-		Uid:      uid, /// this data should come from request!!!!!!!!!!!!1
+		Uid:      uid,
 		UserName: userName,
 		Text:     text,
 	}
 
-	result, err := UpdateCE(id, contribution, last_contribution, reveal_amount)
-	if err != nil || !result {
+	success, err := UpdateCE(id, contribution, closed, reveal_amount)
+	if err != nil || !success {
 		c.Error(err)
 		c.Next()
 		return
 	}
 
-	c.Set("texts", []string{})
-	c.Set("templ", "contribution_success.html")
-
-	if last_contribution {
-		ce, err := GetCEById(id)
-		if err != nil {
-			c.Error(err)
-			c.Next()
-			return
-		}
-		texts := getFullText(ce.Contributions)
-		c.Set("texts", texts)
-		c.Set("templ", "ce.html")
-	}
-
-	c.Next()
-}
-
-func GetRandomCE(c *gin.Context) {
-	ce, err := GetRandomPublicCE()
+	ce, err := GetCEById(id)
 	if err != nil {
 		c.Error(err)
 		c.Next()
 		return
 	}
 
-	c.Set("ce", ce)
-	c.Set("last_contribution", lastContribution(ce))
+	ceRef := users.CERef{
+		ID:     ce.ID,
+		Title:  ce.Title,
+		Reveal: ce.Reveal,
+		Closed: ce.Closed,
+	}
 
+	successUser, err := users.ContributedTo(uid, ceRef)
+	if err != nil || !successUser {
+		c.Error(err)
+		c.Next()
+		return
+	}
+
+	var texts []string
+	templ := "contribution_success.html"
+
+	if closed {
+		texts = getFullText(ce.Contributions)
+		templ = "ce.html"
+	}
+
+	result := gin.H{
+		"texts": texts,
+	}
+
+	c.Status(http.StatusCreated)
+	c.Set("templ", templ)
+	c.Set("result", result)
+	c.Next()
+}
+
+func GetRandomCE(c *gin.Context) {
+	templ := "home.html"
+	if c.Request.Header.Get("HX-Request") != "true" {
+		templ = "index.html"
+		c.Status(http.StatusOK)
+		c.Set("templ", templ)
+		c.Set("result", gin.H{})
+		c.Next()
+		return
+	}
+
+	ce, err := GetRandomPublicCE()
+	if err != nil {
+		c.AbortWithError(http.StatusNotFound, err)
+	}
+
+	last_contribution := lastContribution(ce)
+	result := gin.H{
+		"id":                ce.ID,
+		"reveal":            ce.Reveal,
+		"reveal_amount":     ce.RevealAmount,
+		"last_contribution": last_contribution,
+		"characters_max":    ce.CharactersMax,
+		"words_min":         ce.WordsMin,
+	}
+
+	c.Status(http.StatusOK)
+	c.Set("templ", templ)
+	c.Set("result", result)
+	c.Next()
+}
+
+func NewCE(c *gin.Context) {
+	uid := c.GetString("uid")
+	templ := "newce.html"
+	var resut gin.H
+	if len(uid) == 0 {
+		templ = "signin.html"
+		resut = gin.H{"msg": "please, sign in first:"}
+	}
+
+	c.Status(http.StatusOK)
+	c.Set("templ", templ)
+	c.Set("result", resut)
 	c.Next()
 }

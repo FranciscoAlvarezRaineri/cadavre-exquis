@@ -10,7 +10,7 @@ func AuthCheck(c *gin.Context) {
 	idToken, err := c.Cookie("accessToken")
 	if err != nil {
 		c.Error(err)
-		c.Set("user", "")
+		c.Set("uid", "")
 		c.Next()
 		return
 	}
@@ -21,6 +21,7 @@ func AuthCheck(c *gin.Context) {
 		c.Next()
 		return
 	}
+
 	c.Set("uid", token.UID)
 	c.Next()
 }
@@ -28,7 +29,6 @@ func AuthCheck(c *gin.Context) {
 func AuthGuard(c *gin.Context) {
 	if len(c.Errors.Errors()) != 0 {
 		c.AbortWithError(http.StatusUnauthorized, c.Errors.Last())
-		return
 	}
 	c.Next()
 }

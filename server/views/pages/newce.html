@@ -31,22 +31,11 @@
       />
     </label>
     <label>
-      words limit:
+      minimum words:
       <input
         type="number"
-        name="words_limit"
+        name="words_min"
         value=12
-        autocomplete="off"
-        required
-        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
-      />
-    </label>
-    <label>
-      characters limit:
-      <input
-        type="number"
-        name="characters_limit"
-        value=120
         autocomplete="off"
         required
         class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
@@ -57,12 +46,23 @@
       <input
         type="number"
         name="reveal_amount"
-        value=6
+        value=2
         autocomplete="off"
         required
         class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
       />
     </label>
-    <button type="submit">SignIn</button>
+    <label>
+      characters limit:
+      <input
+        type="number"
+        name="characters_max"
+        value=120
+        autocomplete="off"
+        required
+        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+      />
+    </label>
+    <button type="submit">create</button>
   </form>
 </div>

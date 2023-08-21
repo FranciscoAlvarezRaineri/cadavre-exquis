@@ -1,12 +1,8 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>cadavre exquis</title>
-    <script src="/public/htmx.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
+{{template "head"}}
   <body class="bg-neutral-800 text-neutral-200 flex flex-col max-w-md mx-auto">
     {{template "header"}}
-    <main id="main" hx-trigger="load" hx-get="{{ .main }}"></main>
+    <main id="main" hx-trigger="load" hx-get="/home"></main>
   </body>
 </html>

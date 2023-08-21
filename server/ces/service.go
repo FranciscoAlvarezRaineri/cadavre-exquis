@@ -2,7 +2,6 @@ package ces
 
 import (
 	"cadavre-exquis/firebase/firestore"
-	"log"
 )
 
 func CreateNewCE(
@@ -31,11 +30,7 @@ func GetCEById(id string) (*CE, error) {
 	return result, nil
 }
 
-func UpdateCE(id string, contribution Contribution, last_contribution bool, reveal_amount int) (bool, error) {
-	closed := false
-	if last_contribution {
-		closed = true
-	}
+func UpdateCE(id string, contribution Contribution, closed bool, reveal_amount int) (bool, error) {
 	reveal := generateReveal(contribution.Text, reveal_amount)
 
 	_, err := firestore.UpdateCE(id, contribution, reveal, closed)
@@ -46,27 +41,8 @@ func UpdateCE(id string, contribution Contribution, last_contribution bool, reve
 	return true, err
 }
 
-/*
-func UpdateCE(ce *CE, contribution Contribution) (*CE, error) {
-ce.Contributions = append(ce.Contributions, contribution)
-		ce.Reveal = generateReveal(contribution.Text, ce.RevealAmount)
-		if checkCompleteCE(ce) {
-			ce.Closed = true
-		}
-		dsnap, _, err := firestore.SetDocInCol("ces", ce.ID, ce)
-		if err != nil {
-			return nil, err
-		}
-
-		updatedCE := &CE{}
-		dsnap.DataTo(updatedCE)
-		updatedCE.ID = dsnap.Ref.ID
-
-		return updatedCE, nil
-}*/
-
 func GetRandomPublicCE() (*CE, error) {
-	dsnap, err := firestore.GetRandomPublicCEs()
+	dsnap, err := firestore.GetRandomPublicCE()
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +54,6 @@ func GetRandomPublicCE() (*CE, error) {
 }
 
 func lastContribution(ce *CE) bool {
-	log.Printf("lenght: %v. contributions: %v. result: %v.", ce.Length, len(ce.Contributions), ce.Length == (len(ce.Contributions)+1))
 	return ce.Length == (len(ce.Contributions) + 1)
 }
 

@@ -6,6 +6,7 @@ import (
 	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/render"
 	"cadavre-exquis/users"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,9 +16,9 @@ func main() {
 
 	router := gin.Default()
 
-	router.Use(gin.Recovery())
-
 	router.SetTrustedProxies([]string{"127.0.0.1"})
+
+	// router.Use(gin.Recovery())
 
 	router.Static("/public", "./public")
 
@@ -25,19 +26,20 @@ func main() {
 
 	router.Use(auth.AuthCheck)
 
-	router.GET("/", func(c *gin.Context) { c.Redirect(302, "/home") })
-	router.GET("/home", ces.GetRandomCE, render.Home)
-	router.GET("/user", users.GetUser, render.User)
+	router.GET("/", func(c *gin.Context) { c.Redirect(http.StatusPermanentRedirect, "/home") })
+	router.GET("/home", ces.GetRandomCE, render.HTML)
+	router.GET("/user", users.GetUser, render.HTML)
+	router.POST("/user", users.CreateUser, render.HTML)
+	router.GET("/signin", users.SignIn, render.HTML)
+	router.GET("/signup", users.SignUp, render.HTML)
+	router.GET("/newce", ces.NewCE, render.HTML)
+	router.GET("/ce/:id", ces.GetCE, render.HTML)
 
 	router.Use(auth.AuthGuard)
+	router.Use(users.GetUserMid)
 
-	router.GET("/newce", render.NewCEForm)
-	router.POST("/ces", ces.CreateCE, render.CreateCE) // cambiar a un render específico de mensaje de creación de CE
-	router.PUT("/ces/:id", ces.ContributeToCE, render.ContributeToCE)
-
-	router.Use(func(c *gin.Context) {
-		c.Abort()
-	})
+	router.POST("/ces", ces.CreateCE, render.HTML)
+	router.PUT("/ces/:id", ces.ContributeToCE, render.HTML)
 
 	router.Run("localhost:8080")
 }
