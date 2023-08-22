@@ -1,91 +1,239 @@
 package ces
 
 import (
+	"cadavre-exquis/users"
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 )
 
-func GetCE(c echo.Context) error {
+func GetCE(c *gin.Context) {
 	id := c.Param("id")
 	ce, err := GetCEById(id)
 	if err != nil {
-
-		return c.JSON(http.StatusBadRequest, err)
+		c.AbortWithError(http.StatusNotFound, err)
+		return
 	}
-	return c.Render(http.StatusOK, "index.html", map[string]interface{}{
-		"name": "HOME",
-		"msg":  ce.Title,
-	})
-	// return c.JSON(http.StatusOK, ce)
+
+	texts := getFullText(ce.Contributions)
+	result := gin.H{
+		"title": ce.Title,
+		"texts": texts,
+	}
+	templ := "ce.html"
+
+	c.Status(http.StatusOK)
+	c.Set("templ", templ)
+	c.Set("result", result)
+	c.Next()
 }
 
-func CreateCE(c echo.Context) error {
-	Title := c.QueryParam("title")
+func CreateCE(c *gin.Context) {
+	title := c.Request.FormValue("title")
 
-	Text := c.QueryParam("text")
+	text := c.Request.FormValue("text")
 
-	LengthLimit, err := strconv.Atoi(c.QueryParam("length"))
+	length, err := strconv.Atoi(c.Request.FormValue("length"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Not a valid length limit.")
+		c.Error(err)
 	}
 
-	CharactersLimit, err := strconv.Atoi(c.QueryParam("character-limit"))
+	characters_max, err := strconv.Atoi(c.Request.FormValue("characters_max"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Not a valid character limit.")
+		c.Error(err)
 	}
 
-	WordsLimit, err := strconv.Atoi(c.QueryParam("words-limit"))
+	words_min, err := strconv.Atoi(c.Request.FormValue("words_min"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Not a valid words limit.")
+		c.Error(err)
 	}
 
-	RevealAmount, err := strconv.Atoi(c.QueryParam("reveal-limit"))
+	reveal_amount, err := strconv.Atoi(c.Request.FormValue("reveal_amount"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Not a valid reveal limit.")
+		c.Error(err)
 	}
+
+	if len(c.Errors.Errors()) != 0 {
+		c.Status(http.StatusBadRequest)
+		c.Next()
+		return
+	}
+
+	uid := c.GetString("uid")
+	user := c.MustGet("user").(*users.User)
+	userName := user.UserName
 
 	ce := CE{
-		Title:           Title,
-		LengthLimit:     LengthLimit,
-		CharactersLimit: CharactersLimit,
-		WordsLimit:      WordsLimit,
-		RevealAmount:    RevealAmount,
+		Title:         title,
+		Length:        length,
+		CharactersMax: characters_max,
+		WordsMin:      words_min,
+		RevealAmount:  reveal_amount,
 	}
 
 	contribution := Contribution{
-		Uid:      "123456",
-		UserName: "prueba",
-		Text:     Text,
+		Uid:      uid,
+		UserName: userName,
+		Text:     text,
 	}
 
 	newCE, err := CreateNewCE(ce, contribution)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		c.Status(http.StatusInternalServerError)
+		c.Next()
+		return
 	}
-	return c.JSON(http.StatusOK, newCE)
+
+	ceRef := users.CERef{
+		ID:     newCE.ID,
+		Title:  newCE.Title,
+		Reveal: newCE.Reveal,
+		Closed: newCE.Closed,
+	}
+
+	resultUser, err := users.ContributedTo(uid, ceRef)
+	if err != nil || !resultUser {
+		c.Error(err)
+		c.Next()
+		return
+	}
+
+	result := gin.H{}
+	templ := "create_success.html"
+
+	c.Status(http.StatusCreated)
+	c.Set("templ", templ)
+	c.Set("result", result)
+	c.Next()
 }
 
-func ContributeToCE(c echo.Context) error {
+func ContributeToCE(c *gin.Context) {
 	id := c.Param("id")
 
-	Text := c.QueryParam("text")
+	closed, err := strconv.ParseBool(c.Query("last_contribution"))
+	if err != nil {
+		c.Error(err)
+	}
+
+	reveal_amount, err := strconv.Atoi(c.Query("reveal_amount"))
+	if err != nil {
+		c.Error(err)
+	}
+
+	text := c.Request.FormValue("text")
+	if len(strings.Split(text, " ")) < reveal_amount {
+		err := fmt.Errorf("text is too short. it should be at least %v words long", reveal_amount)
+		c.Error(err)
+	}
+
+	if len(c.Errors.Errors()) != 0 {
+		c.Status(http.StatusBadRequest)
+		c.Next()
+		return
+	}
+
+	uid := c.GetString("uid")
+	user := c.MustGet("user").(*users.User)
+	userName := user.UserName
 
 	contribution := Contribution{
-		Uid:      "123456",
-		UserName: "prueba",
-		Text:     Text,
+		Uid:      uid,
+		UserName: userName,
+		Text:     text,
 	}
 
-	oldCE, err := GetCEById(id)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+	success, err := UpdateCE(id, contribution, closed, reveal_amount)
+	if err != nil || !success {
+		c.Error(err)
+		c.Next()
+		return
 	}
 
-	newCE, err := UpdateCE(oldCE, contribution, id)
+	ce, err := GetCEById(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		c.Error(err)
+		c.Next()
+		return
 	}
-	return c.JSON(http.StatusOK, newCE)
+
+	ceRef := users.CERef{
+		ID:     ce.ID,
+		Title:  ce.Title,
+		Reveal: ce.Reveal,
+		Closed: ce.Closed,
+	}
+
+	successUser, err := users.ContributedTo(uid, ceRef)
+	if err != nil || !successUser {
+		c.Error(err)
+		c.Next()
+		return
+	}
+
+	var texts []string
+	templ := "contribution_success.html"
+
+	if closed {
+		texts = getFullText(ce.Contributions)
+		templ = "ce.html"
+	}
+
+	result := gin.H{
+		"texts": texts,
+	}
+
+	c.Status(http.StatusCreated)
+	c.Set("templ", templ)
+	c.Set("result", result)
+	c.Next()
+}
+
+func GetRandomCE(c *gin.Context) {
+	templ := "home.html"
+	if c.Request.Header.Get("HX-Request") != "true" {
+		templ = "index.html"
+		c.Status(http.StatusOK)
+		c.Set("templ", templ)
+		c.Set("result", gin.H{})
+		c.Next()
+		return
+	}
+
+	ce, err := GetRandomPublicCE()
+	if err != nil {
+		c.AbortWithError(http.StatusNotFound, err)
+	}
+
+	last_contribution := lastContribution(ce)
+	result := gin.H{
+		"id":                ce.ID,
+		"reveal":            ce.Reveal,
+		"reveal_amount":     ce.RevealAmount,
+		"last_contribution": last_contribution,
+		"characters_max":    ce.CharactersMax,
+		"words_min":         ce.WordsMin,
+	}
+
+	c.Status(http.StatusOK)
+	c.Set("templ", templ)
+	c.Set("result", result)
+	c.Next()
+}
+
+func NewCE(c *gin.Context) {
+	uid := c.GetString("uid")
+	templ := "newce.html"
+	var resut gin.H
+	if len(uid) == 0 {
+		templ = "signin.html"
+		resut = gin.H{"msg": "please, sign in first:"}
+	}
+
+	c.Status(http.StatusOK)
+	c.Set("templ", templ)
+	c.Set("result", resut)
+	c.Next()
 }

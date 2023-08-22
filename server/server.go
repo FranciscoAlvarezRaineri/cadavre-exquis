@@ -1,33 +1,45 @@
 package main
 
 import (
+	"cadavre-exquis/ces"
+	"cadavre-exquis/firebase/auth"
 	"cadavre-exquis/firebase/firestore"
-	"cadavre-exquis/router"
 	"cadavre-exquis/render"
+	"cadavre-exquis/users"
+	"net/http"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	defer firestore.Close()
 
-	e := echo.New()
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "method=${method}, uri=${uri}, status=${status}\n",
-	}))
+	router := gin.Default()
 
-	e.Renderer = render.TemplateRenderer
+	router.SetTrustedProxies([]string{"127.0.0.1"})
 
-	router.PublicRoutes(e)
+	// router.Use(gin.Recovery())
 
-	e.Use()
+	router.Static("/public", "./public")
 
-	// e.Use(authMiddleware)
+	router.LoadHTMLGlob("views/**/*.html")
 
-	router.UserRoutes(e)
+	router.Use(auth.AuthCheck)
 
-	router.CesRoutes(e)
+	router.GET("/", func(c *gin.Context) { c.Redirect(http.StatusPermanentRedirect, "/home") })
+	router.GET("/home", ces.GetRandomCE, render.HTML)
+	router.GET("/user", users.GetUser, render.HTML)
+	router.POST("/user", users.CreateUser, render.HTML)
+	router.GET("/signin", users.SignIn, render.HTML)
+	router.GET("/signup", users.SignUp, render.HTML)
+	router.GET("/newce", ces.NewCE, render.HTML)
+	router.GET("/ce/:id", ces.GetCE, render.HTML)
 
-	e.Logger.Fatal(e.Start("localhost:8080"))
+	router.Use(auth.AuthGuard)
+	router.Use(users.GetUserMid)
+
+	router.POST("/ces", ces.CreateCE, render.HTML)
+	router.PUT("/ces/:id", ces.ContributeToCE, render.HTML)
+
+	router.Run("localhost:8080")
 }

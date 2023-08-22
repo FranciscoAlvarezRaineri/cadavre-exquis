@@ -1,18 +1,19 @@
 package render
 
 import (
-	"html/template"
-	"io"
-
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 )
 
-type Template struct {
-	templates *template.Template
+func HTML(c *gin.Context) {
+	templ := c.GetString("templ")
+
+	result := c.MustGet("result").(gin.H)
+
+	c.HTML(-1, templ, result)
 }
 
-var TemplateRenderer = &Template{templates: template.Must(template.ParseGlob("views/*.html"))}
+func JSON(c *gin.Context) {
+	result := c.MustGet("result")
 
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
+	c.JSON(-1, result)
 }
