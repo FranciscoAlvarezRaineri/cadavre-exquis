@@ -6,10 +6,6 @@ import (
 	"log"
 )
 
-func GetAuthByUID(UID string) (*auth.Auth, error) {
-	return auth.GetAuthByUID(UID)
-}
-
 func GetUserByUID(UID string) (*User, error) {
 	dsnap, err := firestore.GetDocFromColByID("users", UID)
 	if err != nil {
@@ -29,7 +25,7 @@ func createUser(user_name string, email string, password string) (*User, error) 
 
 	newUser := &User{}
 	newUser.Email = auth.Email
-	newUser.UserName = auth.UserName
+	newUser.UserName = auth.DisplayName
 
 	dsnap, err := firestore.SetDocInCol("users", auth.UID, newUser)
 	if err != nil {

@@ -7,11 +7,21 @@ import (
 )
 
 func GetUser(c *gin.Context) {
+	templ := "user.html"
+	if c.Request.Header.Get("HX-Request") != "true" {
+		templ = "index.html"
+	}
+
 	uid := c.GetString("uid")
 	if len(uid) == 0 {
+		templ = "signin.html"
+		if c.Request.Header.Get("HX-Request") != "true" {
+			templ = "index.html"
+		}
+
 		c.Status(http.StatusOK)
-		c.Set("templ", "signin.html")
-		c.Set("result", gin.H{})
+		c.Set("templ", templ)
+		c.Set("result", gin.H{"main": "signin"})
 		c.Next()
 		return
 	}
@@ -32,12 +42,13 @@ func GetUser(c *gin.Context) {
 	}
 
 	result := gin.H{
+		"main":      "newce",
 		"user_name": user.UserName,
 		"ces":       contributions,
 	}
 
 	c.Status(http.StatusOK)
-	c.Set("templ", "user.html")
+	c.Set("templ", templ)
 	c.Set("result", result)
 	c.Next()
 }

@@ -10,12 +10,6 @@ import (
 
 var client = initAuth()
 
-type Auth struct {
-	UID      string
-	UserName string
-	Email    string
-}
-
 // var uid = "7YzaAOa0m2XYrPTi9pNCqe5hniY2"
 
 func initAuth() *auth.Client {
@@ -26,13 +20,13 @@ func initAuth() *auth.Client {
 	return client
 }
 
-func GetAuthByUID(uid string) (*Auth, error) {
+func GetAuthByUID(uid string) (*auth.UserRecord, error) {
 	userRecord, err := client.GetUser(context.Context, uid)
 	if err != nil {
 		return nil, err
 	}
 
-	auth := &Auth{}
+	auth := &auth.UserRecord{}
 	auth.UID = userRecord.UID
 
 	log.Printf("Successfully fetched user data: %v\n", auth.UID)
@@ -44,7 +38,7 @@ func validateToken(idToken string) (*auth.Token, error) {
 	return client.VerifyIDToken(context.Context, idToken)
 }
 
-func CreateUser(user_name string, email string, password string) (*Auth, error) {
+func CreateUser(user_name string, email string, password string) (*auth.UserRecord, error) {
 	params := (&auth.UserToCreate{}).
 		Email(email).
 		EmailVerified(false).
@@ -57,9 +51,9 @@ func CreateUser(user_name string, email string, password string) (*Auth, error) 
 		return nil, err
 	}
 
-	auth := &Auth{}
+	auth := &auth.UserRecord{}
 	auth.UID = userRecord.UID
-	auth.UserName = userRecord.DisplayName
+	auth.DisplayName = userRecord.DisplayName
 	auth.Email = userRecord.Email
 
 	return auth, nil

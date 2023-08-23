@@ -6,7 +6,6 @@ import (
 	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/render"
 	"cadavre-exquis/users"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,22 +23,24 @@ func main() {
 
 	router.LoadHTMLGlob("views/**/*.html")
 
+	router.Use(render.HTML)
+
 	router.Use(auth.AuthCheck)
 
-	router.GET("/", func(c *gin.Context) { c.Redirect(http.StatusPermanentRedirect, "/home") })
-	router.GET("/home", ces.GetRandomCE, render.HTML)
-	router.GET("/user", users.GetUser, render.HTML)
-	router.POST("/user", users.CreateUser, render.HTML)
-	router.GET("/signin", users.SignIn, render.HTML)
-	router.GET("/signup", users.SignUp, render.HTML)
-	router.GET("/newce", ces.NewCE, render.HTML)
-	router.GET("/ce/:id", ces.GetCE, render.HTML)
+	router.GET("/", ces.GetRandomCE)
+	router.GET("/home", ces.GetRandomCE)
+	router.GET("/user", users.GetUser)
+	router.POST("/user", users.CreateUser)
+	router.GET("/signin", users.SignIn)
+	router.GET("/signup", users.SignUp)
+	router.GET("/ce/:id", ces.GetCE)
+	router.GET("/newce", ces.NewCE)
 
 	router.Use(auth.AuthGuard)
 	router.Use(users.GetUserMid)
 
-	router.POST("/ces", ces.CreateCE, render.HTML)
-	router.PUT("/ces/:id", ces.ContributeToCE, render.HTML)
+	router.POST("/ces", ces.CreateCE)
+	router.PUT("/ces/:id", ces.ContributeToCE)
 
 	router.Run("localhost:8080")
 }

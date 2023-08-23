@@ -1,3 +1,4 @@
+{{ define "newce.html" }}
 <div class="container flex flex-col items-center justify-center" id="content">
   <form id="form" class="container flex flex-col justify-center" hx-post="/ces" hx-target="#main">
     <label>
@@ -66,3 +67,4 @@
     <button type="submit">create</button>
   </form>
 </div>
+{{ end }}

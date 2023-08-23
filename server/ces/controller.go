@@ -195,20 +195,17 @@ func GetRandomCE(c *gin.Context) {
 	templ := "home.html"
 	if c.Request.Header.Get("HX-Request") != "true" {
 		templ = "index.html"
-		c.Status(http.StatusOK)
-		c.Set("templ", templ)
-		c.Set("result", gin.H{})
-		c.Next()
-		return
 	}
 
 	ce, err := GetRandomPublicCE()
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
+		return
 	}
 
 	last_contribution := lastContribution(ce)
 	result := gin.H{
+		"main":              "home",
 		"id":                ce.ID,
 		"reveal":            ce.Reveal,
 		"reveal_amount":     ce.RevealAmount,
@@ -224,16 +221,31 @@ func GetRandomCE(c *gin.Context) {
 }
 
 func NewCE(c *gin.Context) {
-	uid := c.GetString("uid")
 	templ := "newce.html"
-	var resut gin.H
-	if len(uid) == 0 {
-		templ = "signin.html"
-		resut = gin.H{"msg": "please, sign in first:"}
+	if c.Request.Header.Get("HX-Request") != "true" {
+		templ = "index.html"
 	}
 
+	uid := c.GetString("uid")
+	if len(uid) == 0 {
+		templ = "signin.html"
+		if c.Request.Header.Get("HX-Request") != "true" {
+			templ = "index.html"
+		}
+
+		c.Status(http.StatusOK)
+		c.Set("templ", templ)
+		c.Set("result", gin.H{
+			"main": "signin",
+			"msg":  "please, sign in first:",
+		})
+		c.Next()
+		return
+	}
+
+	result := gin.H{"main": "newce"}
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)
-	c.Set("result", resut)
+	c.Set("result", result)
 	c.Next()
 }

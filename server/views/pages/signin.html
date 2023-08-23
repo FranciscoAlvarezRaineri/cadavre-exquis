@@ -1,6 +1,7 @@
+{{ define "signin.html" }}
 <div class="container flex flex-col items-center justify-center" id="content">
   <form id="form" class="container flex flex-col justify-center">
-    <p class="text-center"> {{ .msg }}</p>
+    <p class="text-center">{{ .msg }}</p>
     <label>
       email:
       <input
@@ -34,3 +35,4 @@
     });
   </script>
 </div>
+{{ end }}

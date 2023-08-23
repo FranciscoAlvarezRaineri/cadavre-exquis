@@ -28,7 +28,10 @@ func AuthCheck(c *gin.Context) {
 
 func AuthGuard(c *gin.Context) {
 	if len(c.Errors.Errors()) != 0 {
-		c.AbortWithError(http.StatusUnauthorized, c.Errors.Last())
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{"msg": "please, sign in first:"})
+		c.AbortWithStatus(http.StatusUnauthorized)
 	}
+
 	c.Next()
 }
