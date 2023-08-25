@@ -1,0 +1,1 @@
+export default API_KEY = "AIzaSyCYMDy_Rf1o82MmWVyI0p0fRwyJ2w2dcTs"

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"cadavre-exquis/ces"
+	"cadavre-exquis/email"
 	"cadavre-exquis/users"
 	"fmt"
 	"net/http"
@@ -196,6 +197,8 @@ func ContributeToCE(c *gin.Context) {
 
 	if closed {
 		texts = ces.GetFullText(ce.Contributions)
+		var data interface{}
+		email.SendEmail("franciscoalvarezraineri@gmail.com", data)
 		templ = "ce.html"
 	}
 

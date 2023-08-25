@@ -6,8 +6,8 @@ import {
   signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
-const apiKey = process.env.API_KEY;
-const authDomain = process.env.AUTH_DOMAIN;
+const apiKey = "AIzaSyCYMDy_Rf1o82MmWVyI0p0fRwyJ2w2dcTs";
+const authDomain = "cadavre-exquis-9c7af.firebaseapp.com";
 
 const firebaseConfig = {
   apiKey,
