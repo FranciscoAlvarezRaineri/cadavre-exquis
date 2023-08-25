@@ -13,7 +13,7 @@ import (
 
 func GetCE(c *gin.Context) {
 	id := c.Param("id")
-	ce, err := ces.GetCEById(id)
+	ce, err := ces.GetCE(id)
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
 		return
@@ -58,8 +58,7 @@ func CreateCE(c *gin.Context) {
 	}
 
 	if len(c.Errors.Errors()) != 0 {
-		c.Status(http.StatusBadRequest)
-		c.Next()
+		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
@@ -68,15 +67,13 @@ func CreateCE(c *gin.Context) {
 
 	newCE, err := ces.CreateNewCE(title, length, characters_max, words_min, reveal_amount, uid, userName, text)
 	if err != nil {
-		c.Status(http.StatusInternalServerError)
-		c.Next()
+		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	resultUser, err := users.ContributedTo(uid, newCE)
 	if err != nil || !resultUser {
-		c.Error(err)
-		c.Next()
+		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -96,18 +93,19 @@ func NewCE(c *gin.Context) {
 	}
 
 	uid := c.GetString("uid")
-	if len(uid) == 0 {
+	if uid == "" {
 		templ = "signin.html"
 		if c.Request.Header.Get("HX-Request") != "true" {
 			templ = "index.html"
 		}
 
-		c.Status(http.StatusOK)
-		c.Set("templ", templ)
-		c.Set("result", gin.H{
+		result := gin.H{
 			"main": "signin",
 			"msg":  "please, sign in first:",
-		})
+		}
+		c.Status(http.StatusOK)
+		c.Set("templ", templ)
+		c.Set("result", result)
 		c.Next()
 		return
 	}
@@ -125,7 +123,7 @@ func GetRandomCE(c *gin.Context) {
 		templ = "index.html"
 	}
 
-	ce, err := ces.GetRandomPublicCE()
+	ce, err := ces.GetRandomCE()
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
 		return
@@ -168,8 +166,7 @@ func ContributeToCE(c *gin.Context) {
 	}
 
 	if len(c.Errors.Errors()) != 0 {
-		c.Status(http.StatusBadRequest)
-		c.Next()
+		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
@@ -178,22 +175,19 @@ func ContributeToCE(c *gin.Context) {
 
 	success, err := ces.UpdateCE(id, closed, reveal_amount, uid, userName, text)
 	if err != nil || !success {
-		c.Error(err)
-		c.Next()
+		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	ce, err := ces.GetCEById(id)
+	ce, err := ces.GetCE(id)
 	if err != nil {
-		c.Error(err)
-		c.Next()
+		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 
 	successUser, err := users.ContributedTo(uid, ce)
 	if err != nil || !successUser {
-		c.Error(err)
-		c.Next()
+		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 

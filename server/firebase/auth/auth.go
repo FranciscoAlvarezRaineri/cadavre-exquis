@@ -10,7 +10,7 @@ import (
 
 var client = initAuth()
 
-// var uid = "7YzaAOa0m2XYrPTi9pNCqe5hniY2"
+type Auth = auth.UserRecord
 
 func initAuth() *auth.Client {
 	client, err := firebase.App.Auth(context.Context)
@@ -26,19 +26,16 @@ func GetAuthByUID(uid string) (*auth.UserRecord, error) {
 		return nil, err
 	}
 
-	auth := &auth.UserRecord{}
-	auth.UID = userRecord.UID
+	log.Printf("Successfully fetched user data: %v\n", userRecord.UID)
 
-	log.Printf("Successfully fetched user data: %v\n", auth.UID)
-
-	return auth, nil
+	return userRecord, nil
 }
 
 func validateToken(idToken string) (*auth.Token, error) {
 	return client.VerifyIDToken(context.Context, idToken)
 }
 
-func CreateUser(user_name string, email string, password string) (*auth.UserRecord, error) {
+func CreateAuth(user_name string, email string, password string) (*auth.UserRecord, error) {
 	params := (&auth.UserToCreate{}).
 		Email(email).
 		EmailVerified(false).
@@ -51,10 +48,5 @@ func CreateUser(user_name string, email string, password string) (*auth.UserReco
 		return nil, err
 	}
 
-	auth := &auth.UserRecord{}
-	auth.UID = userRecord.UID
-	auth.DisplayName = userRecord.DisplayName
-	auth.Email = userRecord.Email
-
-	return auth, nil
+	return userRecord, nil
 }

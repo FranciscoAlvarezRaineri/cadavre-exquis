@@ -7,11 +7,13 @@ type Contribution struct {
 }
 
 type CERef struct {
-	ID     string `firestore:"id"`
+	ID     string `firestore:"-"`
 	Closed bool   `firestore:"closed"`
 	Title  string `firestore:"title"`
 	Reveal string `firestore:"reveal"`
 }
+
+type CEs map[string]CERef
 
 type CE struct {
 	ID            string         `firestore:"-"`

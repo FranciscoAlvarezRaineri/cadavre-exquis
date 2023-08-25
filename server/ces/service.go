@@ -1,7 +1,6 @@
 package ces
 
 import (
-	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/models"
 )
 
@@ -15,68 +14,64 @@ func CreateNewCE(
 	userName string,
 	text string,
 ) (*models.CE, error) {
-	ce := models.CE{
+	contribution := models.Contribution{
+		Uid:      uid,
+		UserName: userName,
+		Text:     text,
+	}
+	reveal := generateReveal(contribution.Text, reveal_amount)
+	newCE := &models.CE{
 		Title:         title,
+		Contributions: []models.Contribution{contribution},
 		Length:        length,
 		CharactersMax: characters_max,
 		WordsMin:      words_min,
+		Reveal:        reveal,
 		RevealAmount:  reveal_amount,
+		Closed:        false,
+		Idle:          true,
+		Public:        true,
 	}
 
-	contribution := models.Contribution{
-		Uid:      uid,
-		UserName: userName,
-		Text:     text,
-	}
-
-	newCE := createCE(ce, contribution)
-	dsnap, err := firestore.AddDocInCol("ces", newCE)
+	ce, err := saveCEToDB(newCE)
 	if err != nil {
 		return nil, err
 	}
-	result := &models.CE{}
-	dsnap.DataTo(result)
-	result.ID = dsnap.Ref.ID
-	return result, nil
+
+	return ce, nil
 }
 
-func GetCEById(id string) (*models.CE, error) {
-	dsnap, err := firestore.GetDocFromColByID("ces", id)
+func GetCE(id string) (*models.CE, error) {
+	ce, err := getCEById(id)
 	if err != nil {
 		return nil, err
 	}
-	result := &models.CE{}
-	dsnap.DataTo(result)
-	result.ID = dsnap.Ref.ID
-	return result, nil
+
+	return ce, nil
 }
 
 func UpdateCE(id string, closed bool, reveal_amount int, uid string, userName string, text string) (bool, error) {
-	contribution := models.Contribution{
+	contribution := &models.Contribution{
 		Uid:      uid,
 		UserName: userName,
 		Text:     text,
 	}
-
 	reveal := generateReveal(contribution.Text, reveal_amount)
 
-	_, err := firestore.UpdateCE(id, contribution, reveal, closed)
+	_, err := updateCE(id, contribution, reveal, closed)
 	if err != nil {
 		return false, err
 	}
 
-	return true, err
+	return true, nil
 }
 
-func GetRandomPublicCE() (*models.CE, error) {
-	dsnap, err := firestore.GetRandomPublicCE()
+func GetRandomCE() (*models.CE, error) {
+	ce, err := getRandomPublicIdleCE()
 	if err != nil {
 		return nil, err
 	}
 
-	ce := &models.CE{}
-	dsnap.DataTo(ce)
-	ce.ID = dsnap.Ref.ID
 	return ce, nil
 }
 

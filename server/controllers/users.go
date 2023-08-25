@@ -27,7 +27,7 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
-	user, err := users.GetUserByUID(uid)
+	user, err := users.GetUser(uid)
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
 		return
