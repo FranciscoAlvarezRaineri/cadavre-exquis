@@ -1,6 +1,7 @@
-package ces
+package controllers
 
 import (
+	"cadavre-exquis/ces"
 	"cadavre-exquis/users"
 	"fmt"
 	"net/http"
@@ -12,13 +13,13 @@ import (
 
 func GetCE(c *gin.Context) {
 	id := c.Param("id")
-	ce, err := GetCEById(id)
+	ce, err := ces.GetCEById(id)
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 
-	texts := getFullText(ce.Contributions)
+	texts := ces.GetFullText(ce.Contributions)
 	result := gin.H{
 		"title": ce.Title,
 		"texts": texts,
@@ -63,38 +64,16 @@ func CreateCE(c *gin.Context) {
 	}
 
 	uid := c.GetString("uid")
-	user := c.MustGet("user").(*users.User)
-	userName := user.UserName
+	userName := c.GetString("userName")
 
-	ce := CE{
-		Title:         title,
-		Length:        length,
-		CharactersMax: characters_max,
-		WordsMin:      words_min,
-		RevealAmount:  reveal_amount,
-	}
-
-	contribution := Contribution{
-		Uid:      uid,
-		UserName: userName,
-		Text:     text,
-	}
-
-	newCE, err := CreateNewCE(ce, contribution)
+	newCE, err := ces.CreateNewCE(title, length, characters_max, words_min, reveal_amount, uid, userName, text)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		c.Next()
 		return
 	}
 
-	ceRef := users.CERef{
-		ID:     newCE.ID,
-		Title:  newCE.Title,
-		Reveal: newCE.Reveal,
-		Closed: newCE.Closed,
-	}
-
-	resultUser, err := users.ContributedTo(uid, ceRef)
+	resultUser, err := users.ContributedTo(uid, newCE)
 	if err != nil || !resultUser {
 		c.Error(err)
 		c.Next()
@@ -105,6 +84,65 @@ func CreateCE(c *gin.Context) {
 	templ := "create_success.html"
 
 	c.Status(http.StatusCreated)
+	c.Set("templ", templ)
+	c.Set("result", result)
+	c.Next()
+}
+
+func NewCE(c *gin.Context) {
+	templ := "newce.html"
+	if c.Request.Header.Get("HX-Request") != "true" {
+		templ = "index.html"
+	}
+
+	uid := c.GetString("uid")
+	if len(uid) == 0 {
+		templ = "signin.html"
+		if c.Request.Header.Get("HX-Request") != "true" {
+			templ = "index.html"
+		}
+
+		c.Status(http.StatusOK)
+		c.Set("templ", templ)
+		c.Set("result", gin.H{
+			"main": "signin",
+			"msg":  "please, sign in first:",
+		})
+		c.Next()
+		return
+	}
+
+	result := gin.H{"main": "newce"}
+	c.Status(http.StatusOK)
+	c.Set("templ", templ)
+	c.Set("result", result)
+	c.Next()
+}
+
+func GetRandomCE(c *gin.Context) {
+	templ := "home.html"
+	if c.Request.Header.Get("HX-Request") != "true" {
+		templ = "index.html"
+	}
+
+	ce, err := ces.GetRandomPublicCE()
+	if err != nil {
+		c.AbortWithError(http.StatusNotFound, err)
+		return
+	}
+
+	last_contribution := ces.LastContribution(ce)
+	result := gin.H{
+		"main":              "home",
+		"id":                ce.ID,
+		"reveal":            ce.Reveal,
+		"reveal_amount":     ce.RevealAmount,
+		"last_contribution": last_contribution,
+		"characters_max":    ce.CharactersMax,
+		"words_min":         ce.WordsMin,
+	}
+
+	c.Status(http.StatusOK)
 	c.Set("templ", templ)
 	c.Set("result", result)
 	c.Next()
@@ -136,37 +174,23 @@ func ContributeToCE(c *gin.Context) {
 	}
 
 	uid := c.GetString("uid")
-	user := c.MustGet("user").(*users.User)
-	userName := user.UserName
+	userName := c.GetString("userName")
 
-	contribution := Contribution{
-		Uid:      uid,
-		UserName: userName,
-		Text:     text,
-	}
-
-	success, err := UpdateCE(id, contribution, closed, reveal_amount)
+	success, err := ces.UpdateCE(id, closed, reveal_amount, uid, userName, text)
 	if err != nil || !success {
 		c.Error(err)
 		c.Next()
 		return
 	}
 
-	ce, err := GetCEById(id)
+	ce, err := ces.GetCEById(id)
 	if err != nil {
 		c.Error(err)
 		c.Next()
 		return
 	}
 
-	ceRef := users.CERef{
-		ID:     ce.ID,
-		Title:  ce.Title,
-		Reveal: ce.Reveal,
-		Closed: ce.Closed,
-	}
-
-	successUser, err := users.ContributedTo(uid, ceRef)
+	successUser, err := users.ContributedTo(uid, ce)
 	if err != nil || !successUser {
 		c.Error(err)
 		c.Next()
@@ -177,7 +201,7 @@ func ContributeToCE(c *gin.Context) {
 	templ := "contribution_success.html"
 
 	if closed {
-		texts = getFullText(ce.Contributions)
+		texts = ces.GetFullText(ce.Contributions)
 		templ = "ce.html"
 	}
 
@@ -186,65 +210,6 @@ func ContributeToCE(c *gin.Context) {
 	}
 
 	c.Status(http.StatusCreated)
-	c.Set("templ", templ)
-	c.Set("result", result)
-	c.Next()
-}
-
-func GetRandomCE(c *gin.Context) {
-	templ := "home.html"
-	if c.Request.Header.Get("HX-Request") != "true" {
-		templ = "index.html"
-	}
-
-	ce, err := GetRandomPublicCE()
-	if err != nil {
-		c.AbortWithError(http.StatusNotFound, err)
-		return
-	}
-
-	last_contribution := lastContribution(ce)
-	result := gin.H{
-		"main":              "home",
-		"id":                ce.ID,
-		"reveal":            ce.Reveal,
-		"reveal_amount":     ce.RevealAmount,
-		"last_contribution": last_contribution,
-		"characters_max":    ce.CharactersMax,
-		"words_min":         ce.WordsMin,
-	}
-
-	c.Status(http.StatusOK)
-	c.Set("templ", templ)
-	c.Set("result", result)
-	c.Next()
-}
-
-func NewCE(c *gin.Context) {
-	templ := "newce.html"
-	if c.Request.Header.Get("HX-Request") != "true" {
-		templ = "index.html"
-	}
-
-	uid := c.GetString("uid")
-	if len(uid) == 0 {
-		templ = "signin.html"
-		if c.Request.Header.Get("HX-Request") != "true" {
-			templ = "index.html"
-		}
-
-		c.Status(http.StatusOK)
-		c.Set("templ", templ)
-		c.Set("result", gin.H{
-			"main": "signin",
-			"msg":  "please, sign in first:",
-		})
-		c.Next()
-		return
-	}
-
-	result := gin.H{"main": "newce"}
-	c.Status(http.StatusOK)
 	c.Set("templ", templ)
 	c.Set("result", result)
 	c.Next()

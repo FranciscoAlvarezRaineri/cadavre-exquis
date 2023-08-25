@@ -1,6 +1,7 @@
-package users
+package controllers
 
 import (
+	"cadavre-exquis/users"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -26,20 +27,13 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
-	user, err := GetUserByUID(uid)
+	user, err := users.GetUserByUID(uid)
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 
-	var contributions []CERef
-	for id, ce := range user.Ces {
-		if ce.Closed {
-			contribution := ce
-			contribution.ID = id
-			contributions = append(contributions, contribution)
-		}
-	}
+	contributions := users.GetClosedContributions(user.Ces)
 
 	result := gin.H{
 		"main":      "newce",
@@ -50,6 +44,25 @@ func GetUser(c *gin.Context) {
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)
 	c.Set("result", result)
+	c.Next()
+}
+
+func CreateUser(c *gin.Context) {
+	user_name := c.Request.FormValue("user_name")
+
+	email := c.Request.FormValue("email")
+
+	password := c.Request.FormValue("password")
+
+	_, err := users.CreateUser(user_name, email, password)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Status(http.StatusCreated)
+	c.Set("templ", "home.html")
+	c.Set("result", gin.H{})
 	c.Next()
 }
 
@@ -65,21 +78,4 @@ func SignUp(c *gin.Context) {
 	c.Set("templ", "signup.html")
 	c.Set("result", gin.H{})
 	c.Next()
-}
-
-func CreateUser(c *gin.Context) {
-	user_name := c.Request.FormValue("user_name")
-
-	email := c.Request.FormValue("email")
-
-	password := c.Request.FormValue("password")
-
-	_, err := createUser(user_name, email, password)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.Redirect(http.StatusCreated, "/home")
-	c.Abort()
 }

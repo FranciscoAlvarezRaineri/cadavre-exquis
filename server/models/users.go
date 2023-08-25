@@ -1,11 +1,4 @@
-package users
-
-type CERef struct {
-	ID     string `firestore:"id"`
-	Closed bool   `firestore:"closed"`
-	Title  string `firestore:"title"`
-	Reveal string `firestore:"reveal"`
-}
+package models
 
 type User struct {
 	UID         string           `firestore:"-"`

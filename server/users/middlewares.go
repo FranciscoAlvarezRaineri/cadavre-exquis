@@ -13,5 +13,6 @@ func GetUserMid(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, err)
 	}
 	c.Set("user", user)
+	c.Set("userName", user.UserName)
 	c.Next()
 }

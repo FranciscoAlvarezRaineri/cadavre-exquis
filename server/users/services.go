@@ -3,27 +3,28 @@ package users
 import (
 	"cadavre-exquis/firebase/auth"
 	"cadavre-exquis/firebase/firestore"
+	"cadavre-exquis/models"
 	"log"
 )
 
-func GetUserByUID(UID string) (*User, error) {
+func GetUserByUID(UID string) (*models.User, error) {
 	dsnap, err := firestore.GetDocFromColByID("users", UID)
 	if err != nil {
 		return nil, err
 	}
 
-	user := &User{}
+	user := &models.User{}
 	dsnap.DataTo(user)
 	return user, nil
 }
 
-func createUser(user_name string, email string, password string) (*User, error) {
+func CreateUser(user_name string, email string, password string) (*models.User, error) {
 	auth, err := auth.CreateUser(user_name, email, password)
 	if err != nil {
 		return nil, err
 	}
 
-	newUser := &User{}
+	newUser := &models.User{}
 	newUser.Email = auth.Email
 	newUser.UserName = auth.DisplayName
 
@@ -32,13 +33,20 @@ func createUser(user_name string, email string, password string) (*User, error) 
 		return nil, err
 	}
 
-	user := &User{}
+	user := &models.User{}
 	dsnap.DataTo(user)
 	log.Printf("user: %v", user)
 	return user, nil
 }
 
-func ContributedTo(uid string, ceRef CERef) (bool, error) {
+func ContributedTo(uid string, ce *models.CE) (bool, error) {
+	ceRef := models.CERef{
+		ID:     ce.ID,
+		Title:  ce.Title,
+		Reveal: ce.Reveal,
+		Closed: ce.Closed,
+	}
+
 	contributions := map[string]interface{}{
 		ceRef.ID: map[string]interface{}{
 			"closed": ceRef.Closed,
@@ -52,4 +60,17 @@ func ContributedTo(uid string, ceRef CERef) (bool, error) {
 	}
 
 	return true, err
+}
+
+func GetClosedContributions(ces map[string]models.CERef) *[]models.CERef {
+	var contributions []models.CERef
+	for id, ce := range ces {
+		if ce.Closed {
+			contribution := ce
+			contribution.ID = id
+			contributions = append(contributions, contribution)
+		}
+	}
+
+	return &contributions
 }
