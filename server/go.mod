@@ -6,7 +6,6 @@ require (
 	cloud.google.com/go/firestore v1.12.0
 	firebase.google.com/go v3.13.0+incompatible
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-mail/mail v2.3.1+incompatible
 	google.golang.org/api v0.134.0
 )
 
@@ -57,7 +56,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230720185612-659f7aaaa771 // indirect
 	google.golang.org/grpc v1.56.2 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
-	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-	gopkg.in/mail.v2 v2.3.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

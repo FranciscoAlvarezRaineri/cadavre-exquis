@@ -14,5 +14,6 @@ func GetUserMid(c *gin.Context) {
 	}
 	c.Set("user", user)
 	c.Set("userName", user.UserName)
+	c.Set("email", user.Email)
 	c.Next()
 }

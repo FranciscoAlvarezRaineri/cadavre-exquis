@@ -49,8 +49,8 @@
     </form>
     <button hx-get="/user" hx-target="#main">sign in</button>
     <script>
-      const password = document.getElementById("password");
-      const pass_repeat = document.getElementById("pass_repeat");
+      password = document.getElementById("password");
+      pass_repeat = document.getElementById("pass_repeat");
 
       pass_repeat.addEventListener("input", (event) => {
       if (password.value != pass_repeat.value) {
