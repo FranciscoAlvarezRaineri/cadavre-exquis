@@ -1,42 +1,57 @@
 package email
 
 import (
-	"log"
-	"os"
-
-	"github.com/go-mail/mail"
+	"bytes"
+	"fmt"
+	"net/smtp"
+	"text/template"
 )
 
-var sender = os.Getenv("EMAIL")
-var password = os.Getenv("EMAIL_PASSWORD")
-var dialer = mail.NewDialer("smtp.gmail.com", 587, sender, password)
+// Sender data.
+var from = "cadavre.exquis.notifications@gmail.com"
+var password = "mfwrojhcyisbyuwj"
 
-func SendEmail(email string, data interface{}) {
-	/*senderb, check := os.LookupEnv("EMAIL")
-	if !check {
-		log.Print("No email enviromental variable")
-		return
-	}*/
+// smtp server configuration.
+var smtpHost = "smtp.gmail.com"
+var smtpPort = "587"
 
-	m := mail.NewMessage()
+// Authentication.
+var auth = smtp.PlainAuth("", from, password, smtpHost)
 
-	m.SetHeader("From", sender)
+type Body struct {
+	Name  string
+	Title string
+	ID    string
+}
 
-	m.SetHeader("To", email)
+func SendClosedEmail(email string, username string, id string, title string) {
 
-	m.SetHeader("Subject", "Hello!")
+	// Receiver email address.
+	to := []string{email}
 
-	m.SetBody("text/html", "Hello <b>Kate</b> and <i>Noah</i>!")
-
-	// m.Attach("lolcat.jpg")
-
-	// d := mail.NewDialer("smtp.gmail.com", 587, "john.doe@gmail.com", "123456")
-
-	// Send the email to Kate, Noah and Oliver.
-
-	err := dialer.DialAndSend(m)
+	t, err := template.ParseFiles("views/emails/closed_ce.html")
 	if err != nil {
-		log.Printf("Failed to send Email: %v", err)
-		panic(err)
+		fmt.Println(err)
+		return
 	}
+
+	var body bytes.Buffer
+
+	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	body.Write([]byte(fmt.Sprintf("Subject: all the contributions are in! \n%s\n\n", mimeHeaders)))
+
+	var data Body
+	data.Name = username
+	data.Title = title
+	data.ID = id
+
+	t.Execute(&body, data)
+
+	// Sending email.
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, body.Bytes())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Email Sent!")
 }

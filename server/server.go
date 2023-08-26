@@ -32,7 +32,6 @@ func main() {
 	router.POST("/user", controllers.CreateUser)
 	router.GET("/signin", controllers.SignIn)
 	router.GET("/signup", controllers.SignUp)
-	router.GET("/ce/:id", controllers.GetCE)
 	router.GET("/newce", controllers.NewCE)
 
 	router.Use(auth.AuthGuard)
@@ -40,6 +39,7 @@ func main() {
 	router.Use(users.GetUserMid)
 
 	router.POST("/ces", controllers.CreateCE)
+	router.GET("/ces/:id", controllers.GetCE)
 	router.PUT("/ces/:id", controllers.ContributeToCE)
 
 	router.Run("localhost:8080")

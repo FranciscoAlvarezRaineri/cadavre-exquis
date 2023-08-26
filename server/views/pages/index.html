@@ -7,7 +7,8 @@
       {{if (eq .main "newce")}} {{template "newce.html" .}} {{else if (eq .main
       "user")}} {{template "user.html" .}} {{else if (eq .main "home")}}
       {{template "home.html" .}} {{else if (eq .main "signin")}}
-      {{template "signin.html" .}} {{- end}}
+      {{template "signin.html" .}} {{else if (eq .main "ce")}}
+      {{template "ce.html" .}} {{- end}}
     </main>
     <script defer>
       document.body.addEventListener("htmx:beforeSwap", function (evt) {

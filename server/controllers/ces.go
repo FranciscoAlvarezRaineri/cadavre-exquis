@@ -13,9 +13,11 @@ import (
 )
 
 func GetCE(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Params.ByName("id")
 	ce, err := ces.GetCE(id)
 	if err != nil {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
@@ -24,8 +26,9 @@ func GetCE(c *gin.Context) {
 	result := gin.H{
 		"title": ce.Title,
 		"texts": texts,
+		"main":  "ce",
 	}
-	templ := "ce.html"
+	templ := "index.html"
 
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)
@@ -197,8 +200,7 @@ func ContributeToCE(c *gin.Context) {
 
 	if closed {
 		texts = ces.GetFullText(ce.Contributions)
-		var data interface{}
-		email.SendEmail("franciscoalvarezraineri@gmail.com", data)
+		email.SendClosedEmail("franciscoalvarezraineri@gmail.com", userName, ce.ID, ce.Title)
 		templ = "ce.html"
 	}
 
