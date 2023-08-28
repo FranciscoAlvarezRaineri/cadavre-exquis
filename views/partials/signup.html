@@ -1,0 +1,63 @@
+<div class="container flex flex-col items-center justify-center" id="content">
+    <form
+      hx-post="/user"
+      class="container flex flex-col justify-center"
+      hx-target="#main">
+      <label>
+        name:
+        <input
+          type="text"
+          name="user_name"
+          autocomplete="off"
+          required
+          class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        />
+      </label>
+      <label>
+        email:
+        <input
+          type="text"
+          name="email"
+          autocomplete="off"
+          required
+          class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        />
+      </label>
+      <label>
+        password:
+        <input
+          id="password"
+          type="password"
+          name="password"
+          autocomplete="off"
+          required
+          class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        />
+      </label>
+      <label>
+        repeat password:
+        <input
+          id="pass_repeat"
+          type="password"
+          name="pass_repeat"
+          autocomplete="off"
+          required
+          class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        />
+      </label>
+      <button type="submit">sign up</button>
+    </form>
+    <button hx-get="/user" hx-target="#main">sign in</button>
+    <script>
+      password = document.getElementById("password");
+      pass_repeat = document.getElementById("pass_repeat");
+
+      pass_repeat.addEventListener("input", (event) => {
+      if (password.value != pass_repeat.value) {
+        pass_repeat.setCustomValidity("Password doesn't match.");
+      } else {
+        pass_repeat.setCustomValidity("");
+      }
+      });
+    </script>
+</div>

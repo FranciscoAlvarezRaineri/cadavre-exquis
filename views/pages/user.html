@@ -1,0 +1,13 @@
+{{ define "user.html" }}
+<div class="container flex flex-col justify-center">
+    <p class="text-center">{{ .user_name }}</p>
+    <h3 class="text-center">completed</h3>
+    <ul class="container flex flex-col justify-center">
+        {{range .ces}}
+        <button hx-get="/ce/{{ .ID }}" hx-target="#main">
+            <li class="text-center">{{ .Title }}</li>
+        </button>
+        {{end}}
+    </ul>
+</div>
+{{ end }}

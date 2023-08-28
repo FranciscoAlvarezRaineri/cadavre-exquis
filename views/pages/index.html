@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  {{template "head" .}}
+  <body class="bg-neutral-800 text-neutral-200 flex flex-col max-w-md mx-auto">
+    {{template "header" .}}
+    <main id="main">
+      {{if (eq .main "newce")}} {{template "newce.html" .}} {{else if (eq .main
+      "user")}} {{template "user.html" .}} {{else if (eq .main "home")}}
+      {{template "home.html" .}} {{else if (eq .main "signin")}}
+      {{template "signin.html" .}} {{else if (eq .main "ce")}}
+      {{template "ce.html" .}} {{- end}}
+    </main>
+    <script defer>
+      document.body.addEventListener("htmx:beforeSwap", function (evt) {
+        if (evt.detail.xhr.status === 401) {
+          evt.detail.shouldSwap = true;
+        }
+      });
+    </script>
+  </body>
+</html>
