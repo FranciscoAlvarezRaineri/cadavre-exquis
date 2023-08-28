@@ -29,6 +29,8 @@ func GetUser(c *gin.Context) {
 
 	user, err := users.GetUser(uid)
 	if err != nil {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{})
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
@@ -56,6 +58,8 @@ func CreateUser(c *gin.Context) {
 
 	_, err := users.CreateUser(user_name, email, password)
 	if err != nil {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}

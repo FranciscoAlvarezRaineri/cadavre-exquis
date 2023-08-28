@@ -5,14 +5,18 @@ import (
 	"cadavre-exquis/firebase/auth"
 	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/users"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	defer firestore.Close()
 
 	router := gin.Default()
+
+	godotenv.Load(".env")
 
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 
@@ -42,5 +46,5 @@ func main() {
 	router.GET("/ces/:id", controllers.GetCE)
 	router.PUT("/ces/:id", controllers.ContributeToCE)
 
-	router.Run("localhost:8080")
+	router.Run(os.Getenv("HOST_PORT"))
 }

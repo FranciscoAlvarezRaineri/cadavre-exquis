@@ -6,8 +6,8 @@ COPY . .
 
 RUN go mod download
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
+RUN CGO_ENABLED=0 GOOS=linux go build -o /build
 
 EXPOSE 8080
 
-CMD ["/docker-gs-ping"]
+CMD ["/build"]

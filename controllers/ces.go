@@ -62,6 +62,8 @@ func CreateCE(c *gin.Context) {
 	}
 
 	if len(c.Errors.Errors()) != 0 {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{})
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -71,12 +73,16 @@ func CreateCE(c *gin.Context) {
 
 	newCE, err := ces.CreateNewCE(title, length, characters_max, words_min, reveal_amount, uid, userName, text)
 	if err != nil {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	resultUser, err := users.ContributedTo(uid, newCE)
 	if err != nil || !resultUser {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -129,6 +135,8 @@ func GetRandomCE(c *gin.Context) {
 
 	ce, err := ces.GetRandomCE()
 	if err != nil {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{})
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
@@ -170,6 +178,8 @@ func ContributeToCE(c *gin.Context) {
 	}
 
 	if len(c.Errors.Errors()) != 0 {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{})
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -179,6 +189,8 @@ func ContributeToCE(c *gin.Context) {
 
 	success, err := ces.UpdateCE(id, closed, reveal_amount, uid, userName, text)
 	if err != nil || !success {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -191,6 +203,8 @@ func ContributeToCE(c *gin.Context) {
 
 	successUser, err := users.ContributedTo(uid, ce)
 	if err != nil || !successUser {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}

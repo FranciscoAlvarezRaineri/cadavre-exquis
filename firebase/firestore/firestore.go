@@ -52,9 +52,16 @@ func AddDoc(collection string, doc interface{}) (*firestore.DocumentSnapshot, er
 }
 
 func SetDoc(collection string, id string, doc interface{}, opts firestore.SetOption) (*firestore.DocumentSnapshot, error) {
-	_, err := client.Collection(collection).Doc(id).Set(context.Context, doc, opts)
-	if err != nil {
-		return nil, err
+	if opts == nil {
+		_, err := client.Collection(collection).Doc(id).Set(context.Context, doc)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		_, err := client.Collection(collection).Doc(id).Set(context.Context, doc, opts)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	dsnap, err := client.Collection(collection).Doc(id).Get(context.Context)
@@ -70,9 +77,9 @@ func UpdateDoc(collection string, id string, update []firestore.Update) (*firest
 }
 
 type Where struct {
-	Key string
+	Key      string
 	Operator string
-	Value any
+	Value    any
 }
 
 func GetAll2Where(collection string, where1 Where, where2 Where) (*firestore.DocumentSnapshot, error) {

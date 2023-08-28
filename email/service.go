@@ -4,19 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"net/smtp"
+	"os"
 	"text/template"
 )
-
-// Sender data.
-var from = "cadavre.exquis.notifications@gmail.com"
-var password = "mfwrojhcyisbyuwj"
-
-// smtp server configuration.
-var smtpHost = "smtp.gmail.com"
-var smtpPort = "587"
-
-// Authentication.
-var auth = smtp.PlainAuth("", from, password, smtpHost)
 
 type Body struct {
 	Name  string
@@ -25,8 +15,14 @@ type Body struct {
 }
 
 func SendClosedEmail(email string, username string, id string, title string) {
+	var from = os.Getenv("EMAIL")
+	var password = os.Getenv("EMAIL_PASSWORD")
 
-	// Receiver email address.
+	var smtpHost = "smtp.gmail.com"
+	var smtpPort = "587"
+
+	var auth = smtp.PlainAuth("", from, password, smtpHost)
+
 	to := []string{email}
 
 	t, err := template.ParseFiles("views/emails/closed_ce.html")
@@ -47,7 +43,6 @@ func SendClosedEmail(email string, username string, id string, title string) {
 
 	t.Execute(&body, data)
 
-	// Sending email.
 	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, body.Bytes())
 	if err != nil {
 		fmt.Println(err)
