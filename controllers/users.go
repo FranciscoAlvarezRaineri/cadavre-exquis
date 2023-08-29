@@ -38,7 +38,7 @@ func GetUser(c *gin.Context) {
 	contributions := users.GetClosedContributions(user.Ces)
 
 	result := gin.H{
-		"main":      "newce",
+		"main":      "user",
 		"user_name": user.UserName,
 		"ces":       contributions,
 	}

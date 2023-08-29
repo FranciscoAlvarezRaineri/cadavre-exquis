@@ -10,6 +10,8 @@ func GetUserMid(c *gin.Context) {
 	uid := c.GetString("uid")
 	user, err := GetUser(uid)
 	if err != nil {
+		c.Set("result", gin.H{})
+		c.Set("templ", "error.html")
 		c.AbortWithError(http.StatusNotFound, err)
 	}
 	c.Set("user", user)

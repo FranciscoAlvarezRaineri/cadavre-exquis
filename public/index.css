@@ -1,12 +1,50 @@
-.fade-down {
+.fade-down-0 {
     animation-name: drop-fade-in;
-    animation-duration: 1s;
+    animation-duration: 800ms;
     animation-iteration-count: 1;
-    animation-timing-function: ease-in-out
+    animation-fill-mode: backwards;
+    animation-timing-function: ease-out
 }
 
+.fade-down-1 {
+    animation-name: drop-fade-in;
+    animation-duration: 800ms;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+    animation-fill-mode: backwards;
+    animation-delay: 500ms
+}
+
+.fade-down-2 {
+    animation-name: drop-fade-in;
+    animation-duration: 800ms;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+    animation-fill-mode: backwards;
+    animation-delay: 1000ms
+}
+
+.fade-down-3 {
+    animation-name: drop-fade-in;
+    animation-duration: 800ms;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+    animation-fill-mode: backwards;
+    animation-delay: 1500ms
+}
+
+.fade-down-4 {
+    animation-name: drop-fade-in;
+    animation-duration: 800ms;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+    animation-fill-mode: backwards;
+    animation-delay: 2000ms
+}
+
+
 @keyframes drop-fade-in {
-    from {transform: translateY(-8px);
+    from {transform: translateY(-5px);
          opacity: 0}
     to {transform: translateY(0);
         opacity: 100

@@ -18,7 +18,7 @@ func main() {
 
 	godotenv.Load(".env")
 
-	router.SetTrustedProxies([]string{"127.0.0.1"})
+	router.SetTrustedProxies([]string{"0.0.0.0"})
 
 	router.Use(gin.Recovery())
 
