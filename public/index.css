@@ -1,0 +1,14 @@
+.fade-down {
+    animation-name: drop-fade-in;
+    animation-duration: 1s;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in-out
+}
+
+@keyframes drop-fade-in {
+    from {transform: translateY(-8px);
+         opacity: 0}
+    to {transform: translateY(0);
+        opacity: 100
+    }
+  }

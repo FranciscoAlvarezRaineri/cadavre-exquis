@@ -4,6 +4,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOff
 } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -51,3 +52,4 @@ function signUp(email, password) {
 
 window.signIn = signIn
 window.signUp = signUp
+window.signOff = signOff
