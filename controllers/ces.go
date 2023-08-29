@@ -5,6 +5,7 @@ import (
 	email_service "cadavre-exquis/email"
 	"cadavre-exquis/users"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -16,6 +17,7 @@ func GetCE(c *gin.Context) {
 	id := c.Params.ByName("id")
 	ce, err := ces.GetCE(id)
 	if err != nil {
+		log.Print("hola")
 		c.Set("templ", "error.html")
 		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusNotFound, err)
@@ -28,7 +30,7 @@ func GetCE(c *gin.Context) {
 		"texts": texts,
 		"main":  "ce",
 	}
-	templ := "index.html"
+	templ := "ce.html"
 
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)
@@ -63,7 +65,7 @@ func CreateCE(c *gin.Context) {
 
 	if len(c.Errors.Errors()) != 0 {
 		c.Set("templ", "error.html")
-		c.Set("result", gin.H{})
+		c.Set("result", gin.H{"error": c.Errors})
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -74,7 +76,7 @@ func CreateCE(c *gin.Context) {
 	newCE, err := ces.CreateNewCE(title, length, characters_max, words_min, reveal_amount, uid, userName, text)
 	if err != nil {
 		c.Set("templ", "error.html")
-		c.Set("result", gin.H{})
+		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -82,7 +84,7 @@ func CreateCE(c *gin.Context) {
 	resultUser, err := users.ContributedTo(uid, newCE)
 	if err != nil || !resultUser {
 		c.Set("templ", "error.html")
-		c.Set("result", gin.H{})
+		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -136,7 +138,7 @@ func GetRandomCE(c *gin.Context) {
 	ce, err := ces.GetRandomCE()
 	if err != nil {
 		c.Set("templ", "error.html")
-		c.Set("result", gin.H{})
+		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
@@ -179,7 +181,7 @@ func ContributeToCE(c *gin.Context) {
 
 	if len(c.Errors.Errors()) != 0 {
 		c.Set("templ", "error.html")
-		c.Set("result", gin.H{})
+		c.Set("result", gin.H{"error": c.Errors})
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -190,7 +192,7 @@ func ContributeToCE(c *gin.Context) {
 	success, err := ces.UpdateCE(id, closed, reveal_amount, uid, userName, text)
 	if err != nil || !success {
 		c.Set("templ", "error.html")
-		c.Set("result", gin.H{})
+		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -204,7 +206,7 @@ func ContributeToCE(c *gin.Context) {
 	successUser, err := users.ContributedTo(uid, ce)
 	if err != nil || !successUser {
 		c.Set("templ", "error.html")
-		c.Set("result", gin.H{})
+		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
