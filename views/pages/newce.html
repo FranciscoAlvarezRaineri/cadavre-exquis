@@ -1,70 +1,70 @@
 {{ define "newce.html" }}
-<div class="container flex flex-col items-center justify-center" id="content">
-  <form id="form" class="container flex flex-col justify-center" hx-post="/ces" hx-target="#main">
-    <label>
-      title:
+<div class="container flex flex-col items-center justify-center my-1" id="content">
+  <form id="form" class="container flex flex-col justify-center drop-form" hx-post="/ces" hx-target="#main">
+    <label class="text-center mb-3">
+      title
       <input
         type="text"
         name="title"
         autocomplete="off"
-        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        class="appearance-none bg-transparent border-b-2 border-b-neutral-200 w-full text-neutral-200  focus:outline-none"
       />
     </label>
-    <label>
-      first contribution:
+    <label class="text-center mb-4">
+      first contribution
       <input
         type="text"
         name="text"
         autocomplete="off"
         required
-        class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        class="appearance-none bg-transparent border-b-2 border-b-neutral-200 w-full text-neutral-200  focus:outline-none"
       />
     </label>
-    <label>
-      length:
+    <label class="text-center mb-4">
+      length
       <input
         type="number"
         name="length"
         value=12
         autocomplete="off"
         required
-        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        class="text-center appearance-none bg-transparent border-none underline w-full text-neutral-200  leading-tight focus:outline-none"
       />
     </label>
-    <label>
-      minimum words:
+    <label class="text-center mb-4">
+      minimum words
       <input
         type="number"
         name="words_min"
         value=12
         autocomplete="off"
         required
-        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        class="text-center appearance-none bg-transparent border-none underline w-full text-neutral-200  leading-tight focus:outline-none"
       />
     </label>
-    <label>
-      reveal amount:
+    <label class="text-center mb-4">
+      reveal amount
       <input
         type="number"
         name="reveal_amount"
         value=2
         autocomplete="off"
         required
-        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        class="text-center appearance-none bg-transparent border-none underline w-full text-neutral-200  leading-tight focus:outline-none"
       />
     </label>
-    <label>
-      characters limit:
+    <label class="text-center mb-4">
+      characters limit
       <input
         type="number"
         name="characters_max"
         value=120
         autocomplete="off"
         required
-        class="appearance-none bg-transparent border-none underline w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        class="text-center appearance-none bg-transparent border-none underline w-full text-neutral-200  leading-tight focus:outline-none"
       />
     </label>
-    <button type="submit">create</button>
+    <button type="submit" class="my-3">create</button>
   </form>
 </div>
 {{ end }}

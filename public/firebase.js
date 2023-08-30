@@ -4,6 +4,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -49,5 +50,17 @@ function signUp(email, password) {
     });
 }
 
+function signOff() {
+  signOut(auth)
+    .then((userCredential) => {
+      document.cookie = `accessToken=`;
+      htmx.ajax("GET", '/home', '#main')
+    })
+    .catch((error) => {
+      htmx.ajax("GET", '/home', '#main')
+    });
+}
+
 window.signIn = signIn
 window.signUp = signUp
+window.signOff = signOff

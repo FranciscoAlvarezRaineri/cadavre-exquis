@@ -1,11 +1,11 @@
 {{define "ce_open"}}
 <div id="reveal">
-  <p>... {{ .reveal }}</p>
+  <p class="fade-down-0 my-2">... {{ .reveal }}</p>
 </div>
-<div>
+<div class="container flex flex-col justify-center">
   <form
     hx-put="/ces/{{ .id }}?reveal_amount={{ .reveal_amount }}&last_contribution={{ .last_contribution }}"
-    class="container flex flex-col justify-center"
+    class="fade-down-1 flex flex-col justify-center"
     hx-target="#main"
   >
     <input
@@ -18,10 +18,12 @@
       class="appearance-none bg-transparent border-b border-b-neutral-200 w-full text-neutral-200 my-2 focus:outline-none"
     />
     {{if (eq .last_contribution true)}}
+    <div class="fade-down-2 my-2">
       <p class="text-center mb-1">this will be the last contribution</p>
       <p class="text-center mb-1">you can read the complete text if you contribute</p>
+    </div>
     {{- end}}
-    <button type="submit">submit</button>
+    <button class="fade-down-3 my-2" type="submit">submit</button>
   </form>
   <script>
     contribution = document.getElementById("contribution");

@@ -29,6 +29,8 @@ func GetUser(c *gin.Context) {
 
 	user, err := users.GetUser(uid)
 	if err != nil {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
@@ -36,7 +38,7 @@ func GetUser(c *gin.Context) {
 	contributions := users.GetClosedContributions(user.Ces)
 
 	result := gin.H{
-		"main":      "newce",
+		"main":      "user",
 		"user_name": user.UserName,
 		"ces":       contributions,
 	}
@@ -56,26 +58,28 @@ func CreateUser(c *gin.Context) {
 
 	_, err := users.CreateUser(user_name, email, password)
 	if err != nil {
+		c.Set("templ", "error.html")
+		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	c.Status(http.StatusCreated)
 	c.Set("templ", "home.html")
-	c.Set("result", gin.H{})
+	c.Set("result", gin.H{"error": err})
 	c.Next()
 }
 
 func SignIn(c *gin.Context) {
 	c.Status(http.StatusOK)
 	c.Set("templ", "signin.html")
-	c.Set("result", gin.H{})
+	c.Set("result", gin.H{"main": "signin"})
 	c.Next()
 }
 
 func SignUp(c *gin.Context) {
 	c.Status(http.StatusOK)
 	c.Set("templ", "signup.html")
-	c.Set("result", gin.H{})
+	c.Set("result", gin.H{"main": "signup"})
 	c.Next()
 }

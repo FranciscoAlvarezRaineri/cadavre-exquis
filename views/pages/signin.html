@@ -1,30 +1,35 @@
 {{ define "signin.html" }}
-<div class="container flex flex-col items-center justify-center" id="content">
-  <form id="form" class="container flex flex-col justify-center">
-    <p class="text-center">{{ .msg }}</p>
-    <label>
-      email:
+<div
+  class="container flex flex-col items-center justify-center my-3"
+  id="content"
+>
+  <p class="text-center mb-4">{{ .msg }}</p>
+  <form id="form" class="container flex flex-col justify-center drop-form">
+    <label class="text-center mb-4">
+      email
       <input
         type="text"
         name="email"
         autocomplete="off"
         required
-        class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        class="appearance-none bg-transparent border-b-2 border-b-neutral-200 w-full text-neutral-200 focus:outline-none"
       />
     </label>
-    <label>
-      password:
+    <label class="text-center mb-4">
+      password
       <input
         type="password"
         name="password"
         autocomplete="off"
         required
-        class="appearance-none bg-transparent border-none w-full text-neutral-400 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        class="appearance-none bg-transparent border-b-2 border-b-neutral-200 w-full text-neutral-200 focus:outline-none"
       />
     </label>
-    <button type="submit">sign in</button>
+    <button type="submit" class="my-2 transition ease-in-out duration-300 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)]">sign in</button>
   </form>
-  <button hx-get="/signup" hx-target="#main">sign up</button>
+  <button hx-get="/signup" hx-target="#main" hx-push-url="true" class="my-2 transition ease-in-out duration-300 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)]">
+    sign up
+  </button>
   <script type="module" src="/public/firebase.js"></script>
   <script>
     form = document.getElementById("form");
