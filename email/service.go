@@ -25,7 +25,7 @@ func SendClosedEmail(email string, username string, id string, title string) {
 
 	to := []string{email}
 
-	t, err := template.ParseFiles("views/emails/closed_ce.html")
+	t, err := template.ParseFiles("views/emails/closed_ce.gohtml")
 	if err != nil {
 		fmt.Println(err)
 		return

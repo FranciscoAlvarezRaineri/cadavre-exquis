@@ -13,7 +13,7 @@ func RespondJSON(c *gin.Context) {
 }
 
 func RenderHTML(c *gin.Context) {
-	c.Set("templ", "index.html")
+	c.Set("templ", "index.gohtml")
 	c.Set("result", gin.H{})
 
 	c.Next()

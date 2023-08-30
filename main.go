@@ -31,7 +31,7 @@ func main() {
 
 	router.Static("/public", "./public")
 
-	router.LoadHTMLGlob("views/**/*.html")
+	router.LoadHTMLGlob("views/**/*.gohtml")
 
 	router.Use(controllers.RenderHTML)
 
