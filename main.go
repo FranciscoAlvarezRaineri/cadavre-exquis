@@ -14,17 +14,24 @@ import (
 func main() {
 	defer firestore.Close()
 
-	router := gin.Default()
-
 	godotenv.Load(".env")
 
-	router.SetTrustedProxies([]string{"0.0.0.0"})
+	router := gin.Default()
+
+	router.ForwardedByClientIP = true
+
+	router.SetTrustedProxies([]string{
+		"0.0.0.0",
+		"100.20.92.101",
+		"44.225.181.72",
+		"44.227.217.144",
+	})
 
 	router.Use(gin.Recovery())
 
 	router.Static("/public", "./public")
 
-	router.LoadHTMLGlob("views/**/*.html")
+	router.LoadHTMLGlob("views/**/*.gohtml")
 
 	router.Use(controllers.RenderHTML)
 

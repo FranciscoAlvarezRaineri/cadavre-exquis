@@ -8,16 +8,16 @@ import (
 )
 
 func GetUser(c *gin.Context) {
-	templ := "user.html"
+	templ := "user.gohtml"
 	if c.Request.Header.Get("HX-Request") != "true" {
-		templ = "index.html"
+		templ = "index.gohtml"
 	}
 
 	uid := c.GetString("uid")
 	if len(uid) == 0 {
-		templ = "signin.html"
+		templ = "signin.gohtml"
 		if c.Request.Header.Get("HX-Request") != "true" {
-			templ = "index.html"
+			templ = "index.gohtml"
 		}
 
 		c.Status(http.StatusOK)
@@ -29,7 +29,7 @@ func GetUser(c *gin.Context) {
 
 	user, err := users.GetUser(uid)
 	if err != nil {
-		c.Set("templ", "error.html")
+		c.Set("templ", "error.gohtml")
 		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusNotFound, err)
 		return
@@ -58,28 +58,28 @@ func CreateUser(c *gin.Context) {
 
 	_, err := users.CreateUser(user_name, email, password)
 	if err != nil {
-		c.Set("templ", "error.html")
+		c.Set("templ", "error.gohtml")
 		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	c.Status(http.StatusCreated)
-	c.Set("templ", "home.html")
+	c.Set("templ", "home.gohtml")
 	c.Set("result", gin.H{"error": err})
 	c.Next()
 }
 
 func SignIn(c *gin.Context) {
 	c.Status(http.StatusOK)
-	c.Set("templ", "signin.html")
+	c.Set("templ", "signin.gohtml")
 	c.Set("result", gin.H{"main": "signin"})
 	c.Next()
 }
 
 func SignUp(c *gin.Context) {
 	c.Status(http.StatusOK)
-	c.Set("templ", "signup.html")
+	c.Set("templ", "signup.gohtml")
 	c.Set("result", gin.H{"main": "signup"})
 	c.Next()
 }
