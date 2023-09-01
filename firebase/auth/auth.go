@@ -50,3 +50,12 @@ func CreateAuth(user_name string, email string, password string) (*auth.UserReco
 
 	return userRecord, nil
 }
+
+func ConfirmEmail(uid string) (*auth.UserRecord, error) {
+	params := (&auth.UserToUpdate{}).EmailVerified(true)
+	userRecord, err := client.UpdateUser(context.Context, uid, params)
+	if err != nil {
+		return nil, err
+	}
+	return userRecord, nil
+}

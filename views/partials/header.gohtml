@@ -1,18 +1,18 @@
 {{define "header"}}
-<header class="container flex items-center justify-around shadow-sm shadow-neutral-200 my-1">
+<header class="container flex items-center justify-around shadow-sm shadow-neutral-200 my-1 text-center ">
   <div>
     <button hx-get="/newce" hx-target="#main" hx-push-url="true">
-      <span class="transition ease-in-out duration-300 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] text-center">NEW</span>
+      <span class="hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-500 ">NEW</span>
     </button>
   </div>
   <div>
     <button hx-get="/home" hx-target="#main" hx-push-url="true">
-      <span class="transition ease-in-out duration-300 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] text-center">HOME</span>
+      <span class="hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-500">HOME</span>
     </button>
   </div>
   <div>
     <button hx-get="/user" hx-target="#main" hx-push-url="true">
-      <span class="transition ease-in-out duration-300 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] text-center">USER</span>
+      <span class="hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-500">USER</span>
     </button>
   </div>
 </header>

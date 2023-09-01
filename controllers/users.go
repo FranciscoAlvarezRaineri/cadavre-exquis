@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	email_service "cadavre-exquis/email"
 	"cadavre-exquis/users"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -56,7 +58,7 @@ func CreateUser(c *gin.Context) {
 
 	password := c.Request.FormValue("password")
 
-	_, err := users.CreateUser(user_name, email, password)
+	user, err := users.CreateUser(user_name, email, password)
 	if err != nil {
 		c.Set("templ", "error.gohtml")
 		c.Set("result", gin.H{"error": err})
@@ -64,9 +66,30 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
+	log.Printf("user: %v", user)
+
+	email_service.SendConfirmationEmail(user.Email, user.UserName, user.UID, user.Code)
+
 	c.Status(http.StatusCreated)
 	c.Set("templ", "home.gohtml")
 	c.Set("result", gin.H{"error": err})
+	c.Next()
+}
+
+func ConfirmEmail(c *gin.Context) {
+	uid := c.Param("uid")
+	code := c.Param("code")
+	user, err := users.ConfirmEmail(uid, code)
+	if err != nil {
+		c.Set("templ", "error.gohtml")
+		c.Set("result", gin.H{"error": err})
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
+	c.Set("templ", "home.gohtml")
+	c.Set("result", gin.H{"username": user.UserName})
 	c.Next()
 }
 

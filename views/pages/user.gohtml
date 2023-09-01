@@ -1,6 +1,7 @@
 {{ define "user.gohtml" }}
 <div class="container flex flex-col justify-center">
   <p class="text-center my-3">{{ .user_name }}</p>
+  <p class="text-center mb-2">{{.msg}}</p>
   <h3 class="text-center mb-2">completed</h3>
   <ul class="container flex flex-col justify-center drop-list">
     {{range .ces}}

@@ -7,4 +7,5 @@ type User struct {
 	Ces         map[string]CERef `firestore:"ces"`
 	Created     []CERef          `firestore:"created"`
 	Contributed []CERef          `firestore:"contributed"`
+	Code        string           `firestore:"code"`
 }

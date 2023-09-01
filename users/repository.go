@@ -18,6 +18,7 @@ func saveUserToDB(newUser *models.User, uid string) (*models.User, error) {
 
 	user := &models.User{}
 	dsnap.DataTo(user)
+	user.UID = dsnap.Ref.ID
 
 	return user, nil
 }
@@ -30,6 +31,7 @@ func addCEToUser(uid string, contributions models.CEs) (*models.User, error) {
 
 	user := &models.User{}
 	dsnap.DataTo(user)
+	user.UID = dsnap.Ref.ID
 
 	return user, nil
 }
@@ -42,6 +44,11 @@ func getUserByUID(uid string) (*models.User, error) {
 
 	user := &models.User{}
 	dsnap.DataTo(user)
+	user.UID = dsnap.Ref.ID
 
 	return user, nil
+}
+
+func confirmEmail(uid string) (*auth.Auth, error) {
+	return auth.ConfirmEmail(uid)
 }
