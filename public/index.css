@@ -1,3 +1,7 @@
+p, li, label, h3, button, input {
+    text-align: center
+}
+
 .fade-down-0 {
     animation-name: drop-fade-in;
     animation-duration: 600ms;

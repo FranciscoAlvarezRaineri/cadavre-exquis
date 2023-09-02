@@ -2,7 +2,6 @@ package main
 
 import (
 	"cadavre-exquis/controllers"
-	"cadavre-exquis/firebase/auth"
 	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/users"
 	"net/http"
@@ -40,7 +39,7 @@ func main() {
 
 	router.Use(controllers.RenderHTML)
 
-	router.Use(auth.AuthCheck)
+	router.Use(users.AuthCheck)
 
 	router.GET("/", controllers.GetRandomCE)
 	router.GET("/home", controllers.GetRandomCE)
@@ -49,9 +48,9 @@ func main() {
 	router.POST("/user", controllers.CreateUser)
 	router.GET("/signin", controllers.SignIn)
 	router.GET("/signup", controllers.SignUp)
-	router.GET("/newce", controllers.NewCE)
+	router.GET("/newce", controllers.NewCEForm)
 
-	router.Use(auth.AuthGuard)
+	router.Use(users.AuthGuard)
 
 	router.Use(users.GetUserMid)
 

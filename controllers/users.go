@@ -31,8 +31,10 @@ func GetUser(c *gin.Context) {
 
 	user, err := users.GetUser(uid)
 	if err != nil {
-		c.Set("templ", "error.gohtml")
-		c.Set("result", gin.H{"error": err})
+		c.Set("templ", "index.gohtml")
+		c.Set("result", gin.H{
+			"main":  "error",
+			"error": err})
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
@@ -60,8 +62,10 @@ func CreateUser(c *gin.Context) {
 
 	user, err := users.CreateUser(user_name, email, password)
 	if err != nil {
-		c.Set("templ", "error.gohtml")
-		c.Set("result", gin.H{"error": err})
+		c.Set("templ", "index.gohtml")
+		c.Set("result", gin.H{
+			"main":  "error",
+			"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -81,8 +85,10 @@ func ConfirmEmail(c *gin.Context) {
 	code := c.Param("code")
 	user, err := users.ConfirmEmail(uid, code)
 	if err != nil {
-		c.Set("templ", "error.gohtml")
-		c.Set("result", gin.H{"error": err})
+		c.Set("templ", "index.gohtml")
+		c.Set("result", gin.H{
+			"main":  "error",
+			"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}

@@ -31,7 +31,7 @@ func GetAuthByUID(uid string) (*auth.UserRecord, error) {
 	return userRecord, nil
 }
 
-func validateToken(idToken string) (*auth.Token, error) {
+func ValidateToken(idToken string) (*auth.Token, error) {
 	return client.VerifyIDToken(context.Context, idToken)
 }
 

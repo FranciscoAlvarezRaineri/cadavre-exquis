@@ -1,9 +1,4 @@
-<!DOCTYPE html>
-<html>
-    {{template "head" .}}
-  <div class="container flex flex-col justify-center">
-    {{ template "header" . }}
-    <p class="text-center">an error occurred:</p>
-    <p class="text-center">{{ .error }}</p>
-  </div>
-</html>
+<div class="container flex flex-col items-center justify-center">
+  <p class="my-2">sorry, an error occurred</p>
+  <p>{{ .error }}</p>
+</div>
