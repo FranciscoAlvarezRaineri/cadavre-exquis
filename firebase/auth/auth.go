@@ -31,7 +31,7 @@ func GetAuthByUID(uid string) (*auth.UserRecord, error) {
 	return userRecord, nil
 }
 
-func validateToken(idToken string) (*auth.Token, error) {
+func ValidateToken(idToken string) (*auth.Token, error) {
 	return client.VerifyIDToken(context.Context, idToken)
 }
 
@@ -48,5 +48,14 @@ func CreateAuth(user_name string, email string, password string) (*auth.UserReco
 		return nil, err
 	}
 
+	return userRecord, nil
+}
+
+func ConfirmEmail(uid string) (*auth.UserRecord, error) {
+	params := (&auth.UserToUpdate{}).EmailVerified(true)
+	userRecord, err := client.UpdateUser(context.Context, uid, params)
+	if err != nil {
+		return nil, err
+	}
 	return userRecord, nil
 }

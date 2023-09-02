@@ -2,6 +2,7 @@ package ces
 
 import (
 	"cadavre-exquis/models"
+	"log"
 )
 
 func CreateNewCE(
@@ -66,15 +67,36 @@ func UpdateCE(id string, closed bool, reveal_amount int, uid string, userName st
 	return true, nil
 }
 
-func GetRandomCE() (*models.CE, error) {
-	ce, err := getRandomPublicIdleCE()
+func GetRandomCE(uid string) (*models.CE, error) {
+	ce, err := getAllRandomPublicIdleCEs(uid)
 	if err != nil {
 		return nil, err
 	}
 
+	/*
+		if uid != "" {
+			log.Printf("uid: %s", uid)
+			next := checkContributor(uid, ce.Contributions)
+			if next {
+				GetRandomCE(uid)
+			}
+		}
+	*/
+
+	log.Printf("ce: %v", ce.CharactersMax)
 	return ce, nil
 }
 
+/*
+	func checkContributor(uid string, contributions []models.Contribution) bool {
+		for _, contributor := range contributions {
+			if uid == contributor.Uid {
+				return true
+			}
+		}
+		return false
+	}
+*/
 func LastContribution(ce *models.CE) bool {
 	return ce.Length == (len(ce.Contributions) + 1)
 }

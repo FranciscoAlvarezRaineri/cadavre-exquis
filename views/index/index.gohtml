@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  {{template "head.gohtml" .}}
+  <body class="bg-neutral-800 text-neutral-200 flex flex-col max-w-md mx-auto">
+    {{template "header.gohtml" .}}
+    <main id="main">
+      {{if (eq .main "newce")}}
+        {{template "newce.gohtml" .}}
+      {{else if (eq .main "user")}}
+        {{template "user.gohtml" .}}
+      {{else if (eq .main "home")}}
+        {{template "home.gohtml" .}}
+      {{else if (eq .main "signin")}}
+        {{template "signin.gohtml" .}}
+      {{else if (eq .main "ce")}}
+        {{template "ce.gohtml" .}}
+      {{else if (eq .main "error")}}
+        {{template "error.gohtml" .}}
+      {{- end}}
+    </main>
+    <script defer>
+      document.body.addEventListener("htmx:beforeSwap", function (evt) {
+        if (evt.detail.xhr.status === 401) {
+          evt.detail.shouldSwap = true;
+        }
+        if (evt.detail.xhr.status === 404) {
+          evt.detail.shouldSwap = true;
+        }
+      });
+    </script>
+    {{template "footer.gohtml" .}}
+  </body>
+</html>

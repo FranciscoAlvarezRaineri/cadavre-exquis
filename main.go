@@ -2,9 +2,9 @@ package main
 
 import (
 	"cadavre-exquis/controllers"
-	"cadavre-exquis/firebase/auth"
 	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/users"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -31,21 +31,26 @@ func main() {
 
 	router.Static("/public", "./public")
 
+	router.GET("/favicon.ico", func(c *gin.Context) {
+		c.Redirect(http.StatusPermanentRedirect, "/public/favicon.ico")
+	})
+
 	router.LoadHTMLGlob("views/**/*.gohtml")
 
 	router.Use(controllers.RenderHTML)
 
-	router.Use(auth.AuthCheck)
+	router.Use(users.AuthCheck)
 
 	router.GET("/", controllers.GetRandomCE)
 	router.GET("/home", controllers.GetRandomCE)
 	router.GET("/user", controllers.GetUser)
+	router.GET("/users/:uid/confirm/:code", controllers.ConfirmEmail)
 	router.POST("/user", controllers.CreateUser)
 	router.GET("/signin", controllers.SignIn)
 	router.GET("/signup", controllers.SignUp)
-	router.GET("/newce", controllers.NewCE)
+	router.GET("/newce", controllers.NewCEForm)
 
-	router.Use(auth.AuthGuard)
+	router.Use(users.AuthGuard)
 
 	router.Use(users.GetUserMid)
 

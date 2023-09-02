@@ -2,6 +2,7 @@ package users
 
 import (
 	"cadavre-exquis/models"
+	"errors"
 )
 
 func GetUser(UID string) (*models.User, error) {
@@ -22,9 +23,28 @@ func CreateUser(user_name string, email string, password string) (*models.User, 
 	newUser := &models.User{
 		Email:    auth.Email,
 		UserName: auth.DisplayName,
+		Code:     "test_code",
 	}
 
 	user, err := saveUserToDB(newUser, auth.UID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func ConfirmEmail(uid string, code string) (*models.User, error) {
+	user, err := getUserByUID(uid)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Code != code {
+		return nil, errors.New("something went wrong, please try again")
+	}
+
+	_, err = confirmEmail(uid)
 	if err != nil {
 		return nil, err
 	}

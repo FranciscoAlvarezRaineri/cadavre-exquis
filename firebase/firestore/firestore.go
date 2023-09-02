@@ -2,7 +2,6 @@ package firestore
 
 import (
 	"log"
-	"math/rand"
 
 	"cadavre-exquis/context"
 	"cadavre-exquis/firebase"
@@ -82,11 +81,11 @@ type Where struct {
 	Value    any
 }
 
-func GetAll2Where(collection string, where1 Where, where2 Where) (*firestore.DocumentSnapshot, error) {
+func GetAll2Where(collection string, where1 Where, where2 Where) ([]*firestore.DocumentSnapshot, error) {
 	dsnaps, err := client.Collection(collection).Where(where1.Key, where1.Operator, where1.Value).Where(where2.Key, where2.Operator, where2.Value).Documents(context.Context).GetAll()
 	if err != nil {
 		return nil, err
 	}
 
-	return dsnaps[rand.Intn(len(dsnaps))], nil
+	return dsnaps, nil
 }
