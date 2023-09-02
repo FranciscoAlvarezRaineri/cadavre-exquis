@@ -148,6 +148,9 @@ func GetRandomCE(c *gin.Context) {
 	ce, err := ces.GetRandomCE(uid.(string))
 	if err != nil {
 		c.Set("templ", "error.gohtml")
+		if c.Request.Header.Get("HX-Request") != "true" {
+			templ = "index.gohtml"
+		}
 		c.Set("result", gin.H{"error": err})
 		c.AbortWithError(http.StatusNotFound, err)
 		return

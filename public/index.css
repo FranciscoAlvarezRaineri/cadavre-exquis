@@ -1,3 +1,10 @@
+html {
+    height: 99%;
+  }
+  body {
+    min-height: 100%;
+  }
+
 p, li, label, h3, button, input {
     text-align: center
 }
