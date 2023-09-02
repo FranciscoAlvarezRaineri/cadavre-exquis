@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
   {{template "head.gohtml" .}}
-  <body class="bg-neutral-800 text-neutral-200 flex flex-col max-w-md mx-auto">
+  <body class="bg-neutral-800 text-neutral-200">
     {{template "header.gohtml" .}}
-    <main id="main">
+    <main id="main" class="flex flex-col max-w-md mx-auto">
       {{if (eq .main "newce")}}
         {{template "newce.gohtml" .}}
       {{else if (eq .main "user")}}
@@ -18,7 +18,8 @@
         {{template "error.gohtml" .}}
       {{- end}}
     </main>
-    <script defer>
+    {{template "footer.gohtml" .}}
+    <script>
       document.body.addEventListener("htmx:beforeSwap", function (evt) {
         if (evt.detail.xhr.status === 401) {
           evt.detail.shouldSwap = true;
@@ -28,6 +29,5 @@
         }
       });
     </script>
-    {{template "footer.gohtml" .}}
   </body>
 </html>
