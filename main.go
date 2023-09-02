@@ -5,6 +5,7 @@ import (
 	"cadavre-exquis/firebase/auth"
 	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/users"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,10 @@ func main() {
 	router.Use(gin.Recovery())
 
 	router.Static("/public", "./public")
+
+	router.GET("/favicon.ico", func(c *gin.Context) {
+		c.Redirect(http.StatusPermanentRedirect, "/public/favicon.ico")
+	})
 
 	router.LoadHTMLGlob("views/**/*.gohtml")
 
