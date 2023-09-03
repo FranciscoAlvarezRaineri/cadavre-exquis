@@ -1,4 +1,4 @@
-<div class="flex flex-col items-center" id="content">
+<div class="flex flex-col items-center mx-5" id="content">
   <p class="fade-down-0 mt-5">... {{ .reveal }}</p>
   <form
     hx-put="/ces/{{ .id }}?reveal_amount={{ .reveal_amount }}&last_contribution={{ .last_contribution }}"
