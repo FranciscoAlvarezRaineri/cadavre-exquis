@@ -1,9 +1,11 @@
 html {
     height: 99%;
-  }
-  body {
+}
+
+body {
     min-height: 100%;
-  }
+    font-size: 1.25rem;
+}
 
 p, li, label, h3, button, input {
     text-align: center
