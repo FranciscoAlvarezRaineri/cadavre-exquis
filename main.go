@@ -47,7 +47,6 @@ func main() {
 	router.GET("/users/:uid/confirm/:code", controllers.ConfirmEmail)
 	router.POST("/user", controllers.CreateUser)
 	router.GET("/signin", controllers.SignIn)
-	router.GET("/invalidcred", controllers.InvalidCred)
 	router.GET("/signup", controllers.SignUp)
 	router.GET("/newce", controllers.NewCEForm)
 

@@ -145,7 +145,9 @@ func GetRandomCE(c *gin.Context) {
 		templ = "index.gohtml"
 	}
 
-	ce, err := ces.GetRandomCE(uid.(string))
+	id, err := c.Cookie("active_ce")
+
+	ce, err := ces.GetRandomCE(uid.(string), id)
 	if err != nil {
 		c.Set("templ", "error.gohtml")
 		if c.Request.Header.Get("HX-Request") != "true" {
@@ -166,6 +168,8 @@ func GetRandomCE(c *gin.Context) {
 		"characters_max":    ce.CharactersMax,
 		"words_min":         ce.WordsMin,
 	}
+
+	c.SetCookie("active_ce", ce.ID, 3600, "/", "127.0.0.1", false, true)
 
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)

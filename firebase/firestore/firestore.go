@@ -14,7 +14,7 @@ type UpdateArray = []firestore.Update
 var ArrayUnion = firestore.ArrayUnion
 var MergeAll = firestore.MergeAll
 
-var client = initFirestore()
+var Client = initFirestore()
 
 func initFirestore() *firestore.Client {
 	client, err := firebase.App.Firestore(context.Context)
@@ -25,11 +25,11 @@ func initFirestore() *firestore.Client {
 }
 
 func Close() {
-	client.Close()
+	Client.Close()
 }
 
 func GetDoc(collection string, id string) (*firestore.DocumentSnapshot, error) {
-	dsnap, err := client.Collection(collection).Doc(id).Get(context.Context)
+	dsnap, err := Client.Collection(collection).Doc(id).Get(context.Context)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func GetDoc(collection string, id string) (*firestore.DocumentSnapshot, error) {
 }
 
 func AddDoc(collection string, doc interface{}) (*firestore.DocumentSnapshot, error) {
-	newDoc, _, err := client.Collection(collection).Add(context.Context, doc)
+	newDoc, _, err := Client.Collection(collection).Add(context.Context, doc)
 	if err != nil {
 		return nil, err
 	}
@@ -52,18 +52,18 @@ func AddDoc(collection string, doc interface{}) (*firestore.DocumentSnapshot, er
 
 func SetDoc(collection string, id string, doc interface{}, opts firestore.SetOption) (*firestore.DocumentSnapshot, error) {
 	if opts == nil {
-		_, err := client.Collection(collection).Doc(id).Set(context.Context, doc)
+		_, err := Client.Collection(collection).Doc(id).Set(context.Context, doc)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		_, err := client.Collection(collection).Doc(id).Set(context.Context, doc, opts)
+		_, err := Client.Collection(collection).Doc(id).Set(context.Context, doc, opts)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	dsnap, err := client.Collection(collection).Doc(id).Get(context.Context)
+	dsnap, err := Client.Collection(collection).Doc(id).Get(context.Context)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func SetDoc(collection string, id string, doc interface{}, opts firestore.SetOpt
 }
 
 func UpdateDoc(collection string, id string, update []firestore.Update) (*firestore.WriteResult, error) {
-	return client.Collection(collection).Doc(id).Update(context.Context, update)
+	return Client.Collection(collection).Doc(id).Update(context.Context, update)
 }
 
 type Where struct {
@@ -81,8 +81,8 @@ type Where struct {
 	Value    any
 }
 
-func GetAll2Where(collection string, where1 Where, where2 Where) ([]*firestore.DocumentSnapshot, error) {
-	dsnaps, err := client.Collection(collection).Where(where1.Key, where1.Operator, where1.Value).Where(where2.Key, where2.Operator, where2.Value).Documents(context.Context).GetAll()
+func GetAll2Where(collection string, where1 Where, where2 Where, id string) ([]*firestore.DocumentSnapshot, error) {
+	dsnaps, err := Client.Collection(collection).Where(where1.Key, where1.Operator, where1.Value).Where(where2.Key, where2.Operator, where2.Value).Documents(context.Context).GetAll()
 	if err != nil {
 		return nil, err
 	}
