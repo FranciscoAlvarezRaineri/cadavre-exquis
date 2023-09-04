@@ -106,6 +106,13 @@ func SignIn(c *gin.Context) {
 	c.Next()
 }
 
+func InvalidCred(c *gin.Context) {
+	c.Status(http.StatusOK)
+	c.Set("templ", "signin.gohtml")
+	c.Set("result", gin.H{"main": "signin", "msg":"invalid credentials, please try again"})
+	c.Next()
+}
+
 func SignUp(c *gin.Context) {
 	c.Status(http.StatusOK)
 	c.Set("templ", "signup.gohtml")
