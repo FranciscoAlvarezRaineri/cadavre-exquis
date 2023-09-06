@@ -7,8 +7,11 @@ import (
 )
 
 type Result struct {
-	Env  string
-	Data interface{}
+	Env   string
+	Main  string
+	Msg   string
+	Data  interface{}
+	Error error
 }
 
 func RespondJSON(c *gin.Context) {
@@ -21,13 +24,20 @@ func RespondJSON(c *gin.Context) {
 
 func RenderHTML(c *gin.Context) {
 	c.Set("templ", "index.gohtml")
+	c.Set("main", "home.gohtml")
+	c.Set("msg", "")
 	c.Set("data", gin.H{})
-	result := &Result{Env: os.Getenv("ENV")}
 
 	c.Next()
 
 	templ := c.GetString("templ")
 	data, _ := c.Get("data")
+
+	result := &Result{}
+	result.Env = os.Getenv("ENV")
+	result.Main = c.GetString("main")
+	result.Msg = c.GetString("msg")
+	result.Error = c.Errors.Last()
 	result.Data = data
 
 	c.HTML(-1, templ, result)

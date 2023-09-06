@@ -3,7 +3,6 @@ package email_service
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"net/smtp"
 	"os"
 	"text/template"
@@ -48,7 +47,6 @@ func SendClosedEmail(email string, username string, id string, title string) {
 }
 
 func SendConfirmationEmail(email string, username string, uid string, code string) {
-	log.Printf("uid: %s", uid)
 	var from = os.Getenv("EMAIL")
 	var password = os.Getenv("EMAIL_PASSWORD")
 

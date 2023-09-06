@@ -5,7 +5,6 @@ import (
 	email_service "cadavre-exquis/email"
 	"cadavre-exquis/users"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,20 +16,18 @@ func GetCE(c *gin.Context) {
 	id := c.Params.ByName("id")
 	ce, err := ces.GetCE(id)
 	if err != nil {
-		log.Print("hola")
 		c.Set("templ", "index.gohtml")
-		c.Set("data", gin.H{
-			"main":  "error",
-			"error": err})
+		c.Set("main", "error.gohtml")
+
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 
 	texts := ces.GetFullText(ce.Contributions)
+	c.Set("main", "ce.gohtml")
 	data := gin.H{
 		"title": ce.Title,
 		"texts": texts,
-		"main":  "ce",
 	}
 	templ := "ce.gohtml"
 
@@ -67,9 +64,8 @@ func CreateCE(c *gin.Context) {
 
 	if len(c.Errors.Errors()) != 0 {
 		c.Set("templ", "index.gohtml")
-		c.Set("data", gin.H{
-			"main":  "error",
-			"error": c.Errors})
+		c.Set("main", "error.gohtml")
+
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -80,9 +76,8 @@ func CreateCE(c *gin.Context) {
 	newCE, err := ces.CreateNewCE(title, length, characters_max, words_min, reveal_amount, uid, userName, text)
 	if err != nil {
 		c.Set("templ", "index.gohtml")
-		c.Set("data", gin.H{
-			"main":  "error",
-			"error": err})
+		c.Set("main", "error.gohtml")
+
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -90,9 +85,8 @@ func CreateCE(c *gin.Context) {
 	resultUser, err := users.ContributedTo(uid, newCE)
 	if err != nil || !resultUser {
 		c.Set("templ", "index.gohtml")
-		c.Set("data", gin.H{
-			"main":  "error",
-			"error": err})
+		c.Set("main", "error.gohtml")
+
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -119,18 +113,18 @@ func NewCEForm(c *gin.Context) {
 			templ = "index.gohtml"
 		}
 
-		data := gin.H{
-			"main": "signin",
-			"msg":  "please, sign in first:",
-		}
+		data := gin.H{}
 		c.Status(http.StatusOK)
+		c.Set("main", "signin.gohtml")
+		c.Set("msg", "please, sign in first:")
 		c.Set("templ", templ)
 		c.Set("data", data)
 		c.Next()
 		return
 	}
 
-	data := gin.H{"main": "newce"}
+	c.Set("main", "newce.gohtml")
+	data := gin.H{}
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)
 	c.Set("data", data)
@@ -145,7 +139,7 @@ func GetRandomCE(c *gin.Context) {
 		templ = "index.gohtml"
 	}
 
-	id, err := c.Cookie("active_ce")
+	id, _ := c.Cookie("active_ce")
 
 	ce, err := ces.GetRandomCE(uid.(string), id)
 	if err != nil {
@@ -153,14 +147,13 @@ func GetRandomCE(c *gin.Context) {
 		if c.Request.Header.Get("HX-Request") != "true" {
 			templ = "index.gohtml"
 		}
-		c.Set("data", gin.H{"error": err})
+
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 
 	last_contribution := ces.LastContribution(ce)
 	data := gin.H{
-		"main":              "home",
 		"id":                ce.ID,
 		"reveal":            ce.Reveal,
 		"reveal_amount":     ce.RevealAmount,
@@ -169,11 +162,12 @@ func GetRandomCE(c *gin.Context) {
 		"words_min":         ce.WordsMin,
 	}
 
-	c.SetCookie("active_ce", ce.ID, 3600, "/", "127.0.0.1", false, true)
-
+	c.Set("main", "home.gohtml")
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)
 	c.Set("data", data)
+
+	c.SetCookie("active_ce", ce.ID, 3600, "/", "127.0.0.1", false, true)
 	c.Next()
 }
 
@@ -198,9 +192,8 @@ func ContributeToCE(c *gin.Context) {
 
 	if len(c.Errors.Errors()) != 0 {
 		c.Set("templ", "index.gohtml")
-		c.Set("data", gin.H{
-			"main":  "error",
-			"error": err})
+		c.Set("main", "error.gohtml")
+
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -211,9 +204,8 @@ func ContributeToCE(c *gin.Context) {
 	success, err := ces.UpdateCE(id, closed, reveal_amount, uid, userName, text)
 	if err != nil || !success {
 		c.Set("templ", "index.gohtml")
-		c.Set("data", gin.H{
-			"main":  "error",
-			"error": err})
+		c.Set("main", "error.gohtml")
+
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -227,9 +219,8 @@ func ContributeToCE(c *gin.Context) {
 	successUser, err := users.ContributedTo(uid, ce)
 	if err != nil || !successUser {
 		c.Set("templ", "index.gohtml")
-		c.Set("data", gin.H{
-			"main":  "error",
-			"error": err})
+		c.Set("main", "error.gohtml")
+
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}

@@ -4,7 +4,6 @@ import (
 	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/models"
 	"errors"
-	"log"
 	"math/rand"
 	"strings"
 	"time"
@@ -51,8 +50,6 @@ func updateCE(id string, contribution *models.Contribution, reveal string, close
 
 func generateReveal(text string, reveal_amount int) string {
 	split := strings.Split(text, " ")
-	log.Printf("split: %v. length: %v.", split, len(split)-reveal_amount)
-	log.Printf("reveal: %v.", strings.Join(split[len(split)-reveal_amount:], " "))
 	split = split[len(split)-reveal_amount:]
 	output := strings.Join(split, " ")
 	return output
