@@ -85,7 +85,7 @@ func getRandomPublicIdleNotIDCE(uid string, id string) (*models.CE, error) {
 			index = i
 		}
 	}
-	if index <= 0 {
+	if index >= 0 {
 		dsnaps[index] = dsnaps[len(dsnaps)-1]
 		dsnaps = dsnaps[:len(dsnaps)-1]
 	}

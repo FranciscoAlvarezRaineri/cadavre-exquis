@@ -1,25 +1,34 @@
 package controllers
 
 import (
+	"os"
+
 	"github.com/gin-gonic/gin"
 )
+
+type Result struct {
+	Env  string
+	Data interface{}
+}
 
 func RespondJSON(c *gin.Context) {
 	c.Next()
 
-	result := c.MustGet("result")
+	data, _ := c.Get("data")
 
-	c.JSON(-1, result)
+	c.JSON(-1, data)
 }
 
 func RenderHTML(c *gin.Context) {
 	c.Set("templ", "index.gohtml")
-	c.Set("result", gin.H{})
+	c.Set("data", gin.H{})
+	result := &Result{Env: os.Getenv("ENV")}
 
 	c.Next()
 
 	templ := c.GetString("templ")
-	result, _ := c.Get("result")
+	data, _ := c.Get("data")
+	result.Data = data
 
 	c.HTML(-1, templ, result)
 }

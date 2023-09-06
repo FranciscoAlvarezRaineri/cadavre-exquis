@@ -4,17 +4,17 @@
   <body class="bg-neutral-800 text-neutral-200">
     {{template "header.gohtml" .}}
     <main id="main" class="max-w-screen-sm mx-auto px-2">
-      {{if (eq .main "newce")}}
+      {{if (eq .Data.main "newce")}}
         {{template "newce.gohtml" .}}
-      {{else if (eq .main "user")}}
+      {{else if (eq .Data.main "user")}}
         {{template "user.gohtml" .}}
-      {{else if (eq .main "home")}}
+      {{else if (eq .Data.main "home")}}
         {{template "home.gohtml" .}}
-      {{else if (eq .main "signin")}}
+      {{else if (eq .Data.main "signin")}}
         {{template "signin.gohtml" .}}
-      {{else if (eq .main "ce")}}
+      {{else if (eq .Data.main "ce")}}
         {{template "ce.gohtml" .}}
-      {{else if (eq .main "error")}}
+      {{else if (eq .Data.main "error")}}
         {{template "error.gohtml" .}}
       {{- end}}
     </main>

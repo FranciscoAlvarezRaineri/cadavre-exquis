@@ -24,7 +24,7 @@ func GetUser(c *gin.Context) {
 
 		c.Status(http.StatusOK)
 		c.Set("templ", templ)
-		c.Set("result", gin.H{"main": "signin"})
+		c.Set("data", gin.H{"main": "signin"})
 		c.Next()
 		return
 	}
@@ -32,7 +32,7 @@ func GetUser(c *gin.Context) {
 	user, err := users.GetUser(uid)
 	if err != nil {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": err})
 		c.AbortWithError(http.StatusNotFound, err)
@@ -41,7 +41,7 @@ func GetUser(c *gin.Context) {
 
 	contributions := users.GetClosedContributions(user.Ces)
 
-	result := gin.H{
+	data := gin.H{
 		"main":      "user",
 		"user_name": user.UserName,
 		"ces":       contributions,
@@ -49,7 +49,7 @@ func GetUser(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)
-	c.Set("result", result)
+	c.Set("data", data)
 	c.Next()
 }
 
@@ -63,7 +63,7 @@ func CreateUser(c *gin.Context) {
 	user, err := users.CreateUser(user_name, email, password)
 	if err != nil {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -76,7 +76,7 @@ func CreateUser(c *gin.Context) {
 
 	c.Status(http.StatusCreated)
 	c.Set("templ", "home.gohtml")
-	c.Set("result", gin.H{"error": err})
+	c.Set("data", gin.H{"error": err})
 	c.Next()
 }
 
@@ -86,7 +86,7 @@ func ConfirmEmail(c *gin.Context) {
 	user, err := users.ConfirmEmail(uid, code)
 	if err != nil {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -95,20 +95,20 @@ func ConfirmEmail(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 	c.Set("templ", "home.gohtml")
-	c.Set("result", gin.H{"username": user.UserName})
+	c.Set("data", gin.H{"username": user.UserName})
 	c.Next()
 }
 
 func SignIn(c *gin.Context) {
 	c.Status(http.StatusOK)
 	c.Set("templ", "signin.gohtml")
-	c.Set("result", gin.H{"main": "signin"})
+	c.Set("data", gin.H{"main": "signin"})
 	c.Next()
 }
 
 func SignUp(c *gin.Context) {
 	c.Status(http.StatusOK)
 	c.Set("templ", "signup.gohtml")
-	c.Set("result", gin.H{"main": "signup"})
+	c.Set("data", gin.H{"main": "signup"})
 	c.Next()
 }

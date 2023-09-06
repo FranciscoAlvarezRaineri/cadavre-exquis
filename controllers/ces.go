@@ -19,7 +19,7 @@ func GetCE(c *gin.Context) {
 	if err != nil {
 		log.Print("hola")
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": err})
 		c.AbortWithError(http.StatusNotFound, err)
@@ -27,7 +27,7 @@ func GetCE(c *gin.Context) {
 	}
 
 	texts := ces.GetFullText(ce.Contributions)
-	result := gin.H{
+	data := gin.H{
 		"title": ce.Title,
 		"texts": texts,
 		"main":  "ce",
@@ -36,7 +36,7 @@ func GetCE(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)
-	c.Set("result", result)
+	c.Set("data", data)
 	c.Next()
 }
 
@@ -67,7 +67,7 @@ func CreateCE(c *gin.Context) {
 
 	if len(c.Errors.Errors()) != 0 {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": c.Errors})
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -80,7 +80,7 @@ func CreateCE(c *gin.Context) {
 	newCE, err := ces.CreateNewCE(title, length, characters_max, words_min, reveal_amount, uid, userName, text)
 	if err != nil {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -90,19 +90,19 @@ func CreateCE(c *gin.Context) {
 	resultUser, err := users.ContributedTo(uid, newCE)
 	if err != nil || !resultUser {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	result := gin.H{}
+	data := gin.H{}
 	templ := "create_success.gohtml"
 
 	c.Status(http.StatusCreated)
 	c.Set("templ", templ)
-	c.Set("result", result)
+	c.Set("data", data)
 	c.Next()
 }
 
@@ -119,21 +119,21 @@ func NewCEForm(c *gin.Context) {
 			templ = "index.gohtml"
 		}
 
-		result := gin.H{
+		data := gin.H{
 			"main": "signin",
 			"msg":  "please, sign in first:",
 		}
 		c.Status(http.StatusOK)
 		c.Set("templ", templ)
-		c.Set("result", result)
+		c.Set("data", data)
 		c.Next()
 		return
 	}
 
-	result := gin.H{"main": "newce"}
+	data := gin.H{"main": "newce"}
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)
-	c.Set("result", result)
+	c.Set("data", data)
 	c.Next()
 }
 
@@ -153,13 +153,13 @@ func GetRandomCE(c *gin.Context) {
 		if c.Request.Header.Get("HX-Request") != "true" {
 			templ = "index.gohtml"
 		}
-		c.Set("result", gin.H{"error": err})
+		c.Set("data", gin.H{"error": err})
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 
 	last_contribution := ces.LastContribution(ce)
-	result := gin.H{
+	data := gin.H{
 		"main":              "home",
 		"id":                ce.ID,
 		"reveal":            ce.Reveal,
@@ -173,7 +173,7 @@ func GetRandomCE(c *gin.Context) {
 
 	c.Status(http.StatusOK)
 	c.Set("templ", templ)
-	c.Set("result", result)
+	c.Set("data", data)
 	c.Next()
 }
 
@@ -198,7 +198,7 @@ func ContributeToCE(c *gin.Context) {
 
 	if len(c.Errors.Errors()) != 0 {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": err})
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -211,7 +211,7 @@ func ContributeToCE(c *gin.Context) {
 	success, err := ces.UpdateCE(id, closed, reveal_amount, uid, userName, text)
 	if err != nil || !success {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -227,7 +227,7 @@ func ContributeToCE(c *gin.Context) {
 	successUser, err := users.ContributedTo(uid, ce)
 	if err != nil || !successUser {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": err})
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -244,12 +244,12 @@ func ContributeToCE(c *gin.Context) {
 		templ = "ce.gohtml"
 	}
 
-	result := gin.H{
+	data := gin.H{
 		"texts": texts,
 	}
 
 	c.Status(http.StatusCreated)
 	c.Set("templ", templ)
-	c.Set("result", result)
+	c.Set("data", data)
 	c.Next()
 }
