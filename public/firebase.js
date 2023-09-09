@@ -2,7 +2,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebas
 
 import {
   getAuth,
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
@@ -30,23 +29,9 @@ function signIn(email, password) {
       htmx.ajax("GET", '/home', '#main')
     })
     .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // htmx.ajax("GET", '/home', '#main') should show error message
-    });
-}
-
-function signUp(email, password) {
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      document.cookie = `accessToken=${user.accessToken}`;
-      htmx.ajax("GET", '/home', '#main')
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // htmx.ajax("GET", '/home', '#main') should show error message
+      document.getElementById("msg").innerText = "invalid credentials, please try again"
+      document.getElementById("email").value = ""
+      document.getElementById("password").value = ""
     });
 }
 
@@ -62,5 +47,4 @@ function signOff() {
 }
 
 window.signIn = signIn
-window.signUp = signUp
 window.signOff = signOff

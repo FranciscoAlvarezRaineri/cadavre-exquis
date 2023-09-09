@@ -30,7 +30,8 @@ func AuthCheck(c *gin.Context) {
 func AuthGuard(c *gin.Context) {
 	if len(c.Errors.Errors()) != 0 {
 		c.Set("templ", "signin.gohtml")
-		c.Set("result", gin.H{"msg": "please, sign in first:"})
+		c.Set("msg", "please, sign in first:")
+
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -39,16 +40,16 @@ func AuthGuard(c *gin.Context) {
 	auth, err := auth.GetAuthByUID(uid)
 	if err != nil {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
-			"main": "error",
-			"msg":  "something went wrong, please try again"})
+		c.Set("main", "error.gohtml")
+		c.Set("msg", "something went wrong, please try again")
+
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 	/*
 		if !auth.EmailVerified {
 			c.Set("templ", "user.gohtml")
-			c.Set("result", gin.H{"msg": "please verify your email address to continue."})
+			c.Set("data", gin.H{"msg": "please verify your email address to continue."})
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -63,7 +64,8 @@ func GetUserMid(c *gin.Context) {
 	user, err := GetUser(uid)
 	if err != nil {
 		c.Set("templ", "index.gohtml")
-		c.Set("result", gin.H{
+		c.Set("main", "error.gohtml")
+		c.Set("data", gin.H{
 			"main":  "error",
 			"error": err})
 		c.AbortWithError(http.StatusNotFound, err)

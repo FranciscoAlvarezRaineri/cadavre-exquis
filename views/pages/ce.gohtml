@@ -1,7 +1,7 @@
 <div class="flex flex-col justify-center">
-  <h3 class="my-3 text-2xl text-center">{{ .title }}</h3>
+  <h3 class="my-3 text-2xl text-center">{{ .Data.title }}</h3>
   <ul class="ces-list">
-    {{range .texts}}
+    {{range .Data.texts}}
     <li class="mb-1">{{.}}</li>
     {{end}}
   </ul>

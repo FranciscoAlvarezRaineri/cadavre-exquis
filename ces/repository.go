@@ -4,9 +4,9 @@ import (
 	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/models"
 	"errors"
-	"log"
 	"math/rand"
 	"strings"
+	"time"
 )
 
 func saveCEToDB(newCE *models.CE) (*models.CE, error) {
@@ -50,14 +50,12 @@ func updateCE(id string, contribution *models.Contribution, reveal string, close
 
 func generateReveal(text string, reveal_amount int) string {
 	split := strings.Split(text, " ")
-	log.Printf("split: %v. length: %v.", split, len(split)-reveal_amount)
-	log.Printf("reveal: %v.", strings.Join(split[len(split)-reveal_amount:], " "))
 	split = split[len(split)-reveal_amount:]
 	output := strings.Join(split, " ")
 	return output
 }
 
-func getAllRandomPublicIdleCEs(uid string) (*models.CE, error) {
+func getRandomPublicIdleNotIDCE(uid string, id string) (*models.CE, error) {
 	where1 := firestore.Where{
 		Key:      "public",
 		Operator: "==",
@@ -69,7 +67,7 @@ func getAllRandomPublicIdleCEs(uid string) (*models.CE, error) {
 		Value:    false,
 	}
 
-	dsnaps, err := firestore.GetAll2Where("ces", where1, where2)
+	dsnaps, err := firestore.GetAll2Where("ces", where1, where2, id)
 	if err != nil {
 		return nil, err
 	}
@@ -78,35 +76,20 @@ func getAllRandomPublicIdleCEs(uid string) (*models.CE, error) {
 		return nil, errors.New("no available text to contribute to, please start a new one")
 	}
 
-	dsnap := dsnaps[rand.Intn(len(dsnaps))]
+	index := -1
+	for i, dsnap := range dsnaps {
+		if dsnap.Ref.ID == id {
+			index = i
+		}
+	}
+	if index >= 0 {
+		dsnaps[index] = dsnaps[len(dsnaps)-1]
+		dsnaps = dsnaps[:len(dsnaps)-1]
+	}
+
+	dsnap := dsnaps[rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(dsnaps))]
 	ce := &models.CE{}
 	dsnap.DataTo(ce)
 	ce.ID = dsnap.Ref.ID
 	return ce, nil
-
-	/*
-		ces := []*models.CE{}
-		for _, dsnap := range dsnaps {
-			var ce *models.CE
-			mapstructure.Decode(dsnap.Data(), &ce)
-			ce.ID = dsnap.Ref.ID
-			ces = append(ces, ce)
-		}
-	*/
 }
-
-/*
-func filterOutCEsByContributor(uid string, ces []*models.CE) []*models.CE {
-	result := []*models.CE{}
-	for _, ce := range ces {
-		for _, contribution := range ce.Contributions {
-			if contribution.Uid != uid {
-				result = append(result, ce)
-			}
-
-		}
-	}
-
-	return result
-}
-*/
