@@ -4,5 +4,7 @@
     <script src="/public/htmx.min.js"></script>
     <link href="/public/index.css" type="text/css" rel="stylesheet" />
     <link href="/public/build.css" type="text/css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    {{if (eq .Env "dev")}}
+      <script src="https://cdn.tailwindcss.com"></script>
+    {{- end}}
 </head>

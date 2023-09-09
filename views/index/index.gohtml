@@ -12,6 +12,8 @@
         {{template "home.gohtml" .}}
       {{else if (eq .Main "signin.gohtml")}}
         {{template "signin.gohtml" .}}
+      {{else if (eq .Main "signup.gohtml")}}
+        {{template "signup.gohtml" .}}
       {{else if (eq .Main "ce.gohtml")}}
         {{template "ce.gohtml" .}}
       {{else if (eq .Main "error.gohtml")}}

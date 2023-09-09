@@ -31,13 +31,19 @@ func RenderHTML(c *gin.Context) {
 	c.Next()
 
 	templ := c.GetString("templ")
-	data, _ := c.Get("data")
+	main := c.GetString("main")
+	if c.Request.Header.Get("HX-Request") != "true" {
+		main = templ
+		templ = "index.gohtml"
+	}
 
 	result := &Result{}
 	result.Env = os.Getenv("ENV")
-	result.Main = c.GetString("main")
+	result.Main = main
 	result.Msg = c.GetString("msg")
 	result.Error = c.Errors.Last()
+
+	data, _ := c.Get("data")
 	result.Data = data
 
 	c.HTML(-1, templ, result)

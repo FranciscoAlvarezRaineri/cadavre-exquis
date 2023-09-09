@@ -16,8 +16,7 @@ func GetCE(c *gin.Context) {
 	id := c.Params.ByName("id")
 	ce, err := ces.GetCE(id)
 	if err != nil {
-		c.Set("templ", "index.gohtml")
-		c.Set("main", "error.gohtml")
+		c.Set("templ", "error.gohtml")
 
 		c.AbortWithError(http.StatusNotFound, err)
 		return
@@ -29,10 +28,9 @@ func GetCE(c *gin.Context) {
 		"title": ce.Title,
 		"texts": texts,
 	}
-	templ := "ce.gohtml"
 
 	c.Status(http.StatusOK)
-	c.Set("templ", templ)
+	c.Set("templ", "ce.gohtml")
 	c.Set("data", data)
 	c.Next()
 }
@@ -63,8 +61,7 @@ func CreateCE(c *gin.Context) {
 	}
 
 	if len(c.Errors.Errors()) != 0 {
-		c.Set("templ", "index.gohtml")
-		c.Set("main", "error.gohtml")
+		c.Set("templ", "error.gohtml")
 
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -75,8 +72,7 @@ func CreateCE(c *gin.Context) {
 
 	newCE, err := ces.CreateNewCE(title, length, characters_max, words_min, reveal_amount, uid, userName, text)
 	if err != nil {
-		c.Set("templ", "index.gohtml")
-		c.Set("main", "error.gohtml")
+		c.Set("templ", "error.gohtml")
 
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -84,70 +80,39 @@ func CreateCE(c *gin.Context) {
 
 	resultUser, err := users.ContributedTo(uid, newCE)
 	if err != nil || !resultUser {
-		c.Set("templ", "index.gohtml")
-		c.Set("main", "error.gohtml")
+		c.Set("templ", "error.gohtml")
 
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	data := gin.H{}
-	templ := "create_success.gohtml"
-
 	c.Status(http.StatusCreated)
-	c.Set("templ", templ)
-	c.Set("data", data)
+	c.Set("templ", "create_success.gohtml")
 	c.Next()
 }
 
 func NewCEForm(c *gin.Context) {
-	templ := "newce.gohtml"
-	if c.Request.Header.Get("HX-Request") != "true" {
-		templ = "index.gohtml"
-	}
-
 	uid := c.GetString("uid")
 	if uid == "" {
-		templ = "signin.gohtml"
-		if c.Request.Header.Get("HX-Request") != "true" {
-			templ = "index.gohtml"
-		}
-
-		data := gin.H{}
 		c.Status(http.StatusOK)
-		c.Set("main", "signin.gohtml")
 		c.Set("msg", "please, sign in first:")
-		c.Set("templ", templ)
-		c.Set("data", data)
+		c.Set("templ", "signin.gohtml")
 		c.Next()
 		return
 	}
 
-	c.Set("main", "newce.gohtml")
-	data := gin.H{}
 	c.Status(http.StatusOK)
-	c.Set("templ", templ)
-	c.Set("data", data)
+	c.Set("templ", "newce.gohtml")
 	c.Next()
 }
 
 func GetRandomCE(c *gin.Context) {
-	templ := "home.gohtml"
 	uid, _ := c.Get("uid")
-
-	if c.Request.Header.Get("HX-Request") != "true" {
-		templ = "index.gohtml"
-	}
-
 	id, _ := c.Cookie("active_ce")
 
 	ce, err := ces.GetRandomCE(uid.(string), id)
 	if err != nil {
 		c.Set("templ", "error.gohtml")
-		if c.Request.Header.Get("HX-Request") != "true" {
-			templ = "index.gohtml"
-		}
-
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
@@ -162,12 +127,13 @@ func GetRandomCE(c *gin.Context) {
 		"words_min":         ce.WordsMin,
 	}
 
-	c.Set("main", "home.gohtml")
 	c.Status(http.StatusOK)
-	c.Set("templ", templ)
+	c.Set("templ", "home.gohtml")
 	c.Set("data", data)
 
-	c.SetCookie("active_ce", ce.ID, 3600, "/", "127.0.0.1", false, true)
+	c.SetSameSite(http.SameSiteStrictMode)
+	c.SetCookie("active_ce", ce.ID, 3600*24, "/", "127.0.0.1", false, true)
+
 	c.Next()
 }
 
@@ -191,9 +157,7 @@ func ContributeToCE(c *gin.Context) {
 	}
 
 	if len(c.Errors.Errors()) != 0 {
-		c.Set("templ", "index.gohtml")
-		c.Set("main", "error.gohtml")
-
+		c.Set("templ", "error.gohtml")
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -203,9 +167,7 @@ func ContributeToCE(c *gin.Context) {
 
 	success, err := ces.UpdateCE(id, closed, reveal_amount, uid, userName, text)
 	if err != nil || !success {
-		c.Set("templ", "index.gohtml")
-		c.Set("main", "error.gohtml")
-
+		c.Set("templ", "error.gohtml")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -218,29 +180,23 @@ func ContributeToCE(c *gin.Context) {
 
 	successUser, err := users.ContributedTo(uid, ce)
 	if err != nil || !successUser {
-		c.Set("templ", "index.gohtml")
-		c.Set("main", "error.gohtml")
-
+		c.Set("templ", "error.gohtml")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	var texts []string
-	templ := "contribution_success.gohtml"
+	c.Status(http.StatusCreated)
+	c.Set("templ", "contribution_success.gohtml")
 
 	if closed {
-		texts = ces.GetFullText(ce.Contributions)
+		texts := ces.GetFullText(ce.Contributions)
+
 		email := c.GetString("email")
 		email_service.SendClosedEmail(email, userName, ce.ID, ce.Title)
-		templ = "ce.gohtml"
+
+		c.Set("templ", "ce.gohtml")
+		c.Set("data", gin.H{"texts": texts})
 	}
 
-	data := gin.H{
-		"texts": texts,
-	}
-
-	c.Status(http.StatusCreated)
-	c.Set("templ", templ)
-	c.Set("data", data)
 	c.Next()
 }
