@@ -27,7 +27,7 @@
     contribution = document.getElementById("contribution");
     contribution.addEventListener("input", (event) => {
     if (contribution.value.split(" ").length < Number("{{ .Data.words_min}}")) {
-      contribution.setCustomValidity("Please, writte at least {{ .Data.words_min}} words.");
+      contribution.setCustomValidity("Please, write at least {{ .Data.words_min}} words.");
     } else {
       contribution.setCustomValidity("");
     }
