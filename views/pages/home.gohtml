@@ -1,9 +1,9 @@
+{{template "menu.gohtml" . }}
 <div class="flex flex-col items-center mx-5" id="content">
   <p class="fade-down-0 mt-5">... {{ .Data.reveal }}</p>
   <form
-    hx-put="/ces/{{ .Data.id }}?reveal_amount={{ .Data.reveal_amount }}&last_contribution={{ .Data.last_contribution }}"
     class="fade-down-1 flex flex-col justify-center w-full"
-    hx-target="#main"
+    id="form"
   >
     <input
       type="text"
@@ -20,17 +20,60 @@
       <p class="mb-1">you can read the complete text if you contribute</p>
     </div>
     {{- end}}
-    <button class="fade-down-3 my-3 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-500" type="submit">submit</button>
+    <button
+      class="fade-down-3 my-3 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-500"
+      type="submit">
+      submit
+    </button>
   </form>
-  <button class="fade-down-4 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-600" hx-get="/home" hx-target="#main">change</button>
-  <script>
+  <button
+    class="fade-down-4 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-600"
+    hx-get="/home?active_ce={{ .Data.id }}"
+    hx-target="#main"
+    hx-headers='{"Authorization": "{{ .Auth }}"}'
+    id="change">
+    change
+  </button>
+  <script defer>
     contribution = document.getElementById("contribution");
-    contribution.addEventListener("input", (event) => {
+
+    contribution.value = value;
+
+    contribution.addEventListener("change", () => {
+      value = contribution.value
+    });
+
+    contribution.addEventListener("input", () => {
     if (contribution.value.split(" ").length < Number("{{ .Data.words_min}}")) {
       contribution.setCustomValidity("Please, write at least {{ .Data.words_min}} words.");
     } else {
       contribution.setCustomValidity("");
     }
     });
+
+    change = document.getElementById("change");
+
+    change.addEventListener("click", () => {
+      value = ""
+    })
+
+    form = document.getElementById("form");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault()
+      const user = auth.currentUser;
+      console.log(user)
+      if (user) {
+        htmx.ajax(
+          'PUT',
+          "/ces/{{ .Data.id }}?reveal_amount={{ .Data.reveal_amount }}&last_contribution={{ .Data.last_contribution }}",
+          { target: '#main', headers: { "Authorization": user.accessToken } })
+      } else {
+        htmx.ajax(
+          'GET',
+          "/signin",
+          { target: '#main', headers: { "Authorization": user.accessToken } })
+      }
+    })
   </script>
 </div>

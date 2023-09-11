@@ -108,7 +108,7 @@ func NewCEForm(c *gin.Context) {
 
 func GetRandomCE(c *gin.Context) {
 	uid, _ := c.Get("uid")
-	id, _ := c.Cookie("active_ce")
+	id := c.Query("active_ce")
 
 	ce, err := ces.GetRandomCE(uid.(string), id)
 	if err != nil {

@@ -1,5 +1,11 @@
+{{template "menu.gohtml" . }}
 <div class="flex flex-col items-center mx-5" id="content">
-  <form id="form" class="flex flex-col items-center justify-center drop-form w-full mt-4 " hx-post="/ces" hx-target="#main">
+  <form
+    id="form"
+    class="flex flex-col items-center justify-center drop-form w-full mt-4"
+    hx-post="/ces"
+    hx-target="#main"
+    hx-headers='{"Authorization": "{{ .Auth }}"}'>
     <label class="text-center w-full">
       title
       <br class="mb-2">

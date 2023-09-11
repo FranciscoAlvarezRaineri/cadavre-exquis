@@ -1,10 +1,11 @@
+{{template "menu.gohtml" . }}
 <div class="flex flex-col justify-center">
   <p class="my-3">{{ .Data.user_name }}</p>
   <p class="mb-2">{{ .Msg }}</p>
   <h3 class="mb-2 text-lg text-center">completed</h3>
   <ul class="flex flex-col justify-center drop-list">
     {{range .Data.ces}}
-    <li hx-get="/ces/{{ .ID }}" hx-target="#main" hx-push-url="true">
+    <li hx-get="/ces/{{ .ID }}" hx-target="#main" hx-push-url="true" hhx-headers='{"Authorization": "{{ .Auth }}"}'>
       <p
         class="my-0.5 transition ease-in-out duration-300 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] hover:cursor-pointer"
       >
