@@ -1,10 +1,14 @@
 <head>
-    <title>cadavre exquis</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="/public/htmx.min.js"></script>
-    <link href="/public/index.css" type="text/css" rel="stylesheet" />
-    <link href="/public/build.css" type="text/css" rel="stylesheet" />
-    {{if (eq .Env "dev")}}
-      <script src="https://cdn.tailwindcss.com"></script>
-    {{- end}}
+  <title>cadavre exquis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/public/index.css" type="text/css" rel="stylesheet" />
+  <link href="/public/build.css" type="text/css" rel="stylesheet" />
+  {{if (eq .Env "dev")}}
+    <script src="https://cdn.tailwindcss.com"></script>
+  {{- end}}
+  <script src="/public/htmx.min.js"></script>
+  <script type="module" src="/public/firebase.js"></script>
+  <script>
+    let value = ""
+  </script>
 </head>

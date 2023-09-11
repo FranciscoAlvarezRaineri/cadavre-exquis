@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,7 @@ type Result struct {
 	Msg   string
 	Data  interface{}
 	Error error
+	Auth  string
 }
 
 func RespondJSON(c *gin.Context) {
@@ -41,6 +43,8 @@ func RenderHTML(c *gin.Context) {
 	result.Env = os.Getenv("ENV")
 	result.Main = main
 	result.Msg = c.GetString("msg")
+	result.Auth = c.GetHeader("Authorization")
+	log.Printf("auth: %s", c.GetHeader("Authorization"))
 	result.Error = c.Errors.Last()
 
 	data, _ := c.Get("data")

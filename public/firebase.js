@@ -24,9 +24,8 @@ function signIn(email, password) {
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
-      document.cookie = `accessToken=${user.accessToken}`;
 
-      htmx.ajax("GET", '/home', '#main')
+      htmx.ajax("GET", '/home', { target: '#main', headers: { "Authorization": user.accessToken } })
     })
     .catch((error) => {
       document.getElementById("msg").innerText = "invalid credentials, please try again"
@@ -37,9 +36,8 @@ function signIn(email, password) {
 
 function signOff() {
   signOut(auth)
-    .then((userCredential) => {
-      document.cookie = `accessToken=`;
-      htmx.ajax("GET", '/home', '#main')
+    .then(() => {
+      htmx.ajax("GET", '/home', { target: '#main', headers: { "Authorization": "" } })
     })
     .catch((error) => {
       htmx.ajax("GET", '/home', '#main')
@@ -48,3 +46,4 @@ function signOff() {
 
 window.signIn = signIn
 window.signOff = signOff
+window.auth = auth

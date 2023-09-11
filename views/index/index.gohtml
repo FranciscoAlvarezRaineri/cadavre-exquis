@@ -2,22 +2,21 @@
 <html>
   {{template "head.gohtml" .}}
   <body class="bg-neutral-800 text-neutral-200">
-    {{template "header.gohtml" .}}
-    <main id="main" class="max-w-screen-sm mx-auto px-2">
-      {{if (eq .Main "newce.gohtml")}}
-        {{template "newce.gohtml" .}}
-      {{else if (eq .Main "user.gohtml")}}
-        {{template "user.gohtml" .}}
+    <main id="main" class="mx-auto">
+      {{if (eq .Main "ce.gohtml")}}
+        {{template "ce.gohtml" .}}
+      {{else if (eq .Main "error.gohtml")}}
+        {{template "error.gohtml" .}}
       {{else if (eq .Main "home.gohtml")}}
         {{template "home.gohtml" .}}
+      {{else if (eq .Main "newce.gohtml")}}
+        {{template "newce.gohtml" .}}
       {{else if (eq .Main "signin.gohtml")}}
         {{template "signin.gohtml" .}}
       {{else if (eq .Main "signup.gohtml")}}
         {{template "signup.gohtml" .}}
-      {{else if (eq .Main "ce.gohtml")}}
-        {{template "ce.gohtml" .}}
-      {{else if (eq .Main "error.gohtml")}}
-        {{template "error.gohtml" .}}
+      {{else if (eq .Main "user.gohtml")}}
+        {{template "user.gohtml" .}}
       {{- end}}
     </main>
     {{template "footer.gohtml" .}}
