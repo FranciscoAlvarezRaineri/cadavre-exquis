@@ -26,8 +26,6 @@ func GetAuthByUID(uid string) (*auth.UserRecord, error) {
 		return nil, err
 	}
 
-	log.Printf("Successfully fetched user data: %v\n", userRecord.UID)
-
 	return userRecord, nil
 }
 

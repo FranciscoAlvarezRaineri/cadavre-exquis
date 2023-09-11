@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -44,7 +43,6 @@ func RenderHTML(c *gin.Context) {
 	result.Main = main
 	result.Msg = c.GetString("msg")
 	result.Auth = c.GetHeader("Authorization")
-	log.Printf("auth: %s", c.GetHeader("Authorization"))
 	result.Error = c.Errors.Last()
 
 	data, _ := c.Get("data")

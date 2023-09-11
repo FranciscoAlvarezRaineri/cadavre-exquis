@@ -4,6 +4,7 @@ import (
 	"cadavre-exquis/controllers"
 	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/users"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -58,5 +59,6 @@ func main() {
 	router.GET("/ces/:id", controllers.GetCE)
 	router.PUT("/ces/:id", controllers.ContributeToCE)
 
-	router.Run(os.Getenv("HOST_PORT"))
+	HOST_PORT := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
+	router.Run(HOST_PORT)
 }
