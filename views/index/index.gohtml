@@ -9,6 +9,8 @@
         {{template "error.gohtml" .}}
       {{else if (eq .Main "home.gohtml")}}
         {{template "home.gohtml" .}}
+      {{else if (eq .Main "landing.gohtml")}}
+        {{template "landing.gohtml" .}}
       {{else if (eq .Main "newce.gohtml")}}
         {{template "newce.gohtml" .}}
       {{else if (eq .Main "signin.gohtml")}}
@@ -20,7 +22,7 @@
       {{- end}}
     </main>
     {{template "footer.gohtml" .}}
-    <script>
+    <script defer>
       document.body.addEventListener("htmx:beforeSwap", function (evt) {
         if (evt.detail.xhr.status === 401) {
           evt.detail.shouldSwap = true;

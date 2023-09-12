@@ -7,8 +7,51 @@
     <script src="https://cdn.tailwindcss.com"></script>
   {{- end}}
   <script src="/public/htmx.min.js"></script>
-  <script type="module" src="/public/firebase.js"></script>
-  <script>
+  <script type="module">
     let value = ""
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYMDy_Rf1o82MmWVyI0p0fRwyJ2w2dcTs",
+      authDomain: "cadavre-exquis-9c7af.firebaseapp.com",
+      projectId: "cadavre-exquis-9c7af",
+      storageBucket: "cadavre-exquis-9c7af.appspot.com",
+      messagingSenderId: "950495760420",
+      appId: "1:950495760420:web:57784044dd9be8f95548b1",
+      measurementId: "G-80DH0CRH6R"
+    }
+
+    const app = initializeApp(firebaseConfig);
+
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) htmx.ajax("GET", '/home', { target: '#main', headers: { "Authorization": user.accessToken, "ActiveCE": "{{ .Data.id }}", "ReRender": true } })
+    });
+
+    function signIn(email, password) {
+      signInWithEmailAndPassword(auth, email, password)
+        .catch((error) => {
+          document.getElementById("msg").innerText = "invalid credentials, please try again"
+          document.getElementById("email").value = ""
+          document.getElementById("password").value = ""
+        });
+    }
+
+    function signOff() {
+      signOut(auth)
+    }
+
+    window.auth = auth
+    window.signIn = signIn
+    window.signOff = signOff
   </script>
 </head>

@@ -3,7 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebas
 import {
   getAuth,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -22,11 +23,6 @@ const auth = getAuth(app);
 
 function signIn(email, password) {
   signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-
-      htmx.ajax("GET", '/home', { target: '#main', headers: { "Authorization": user.accessToken } })
-    })
     .catch((error) => {
       document.getElementById("msg").innerText = "invalid credentials, please try again"
       document.getElementById("email").value = ""
@@ -36,14 +32,9 @@ function signIn(email, password) {
 
 function signOff() {
   signOut(auth)
-    .then(() => {
-      htmx.ajax("GET", '/home', { target: '#main', headers: { "Authorization": "" } })
-    })
-    .catch((error) => {
-      htmx.ajax("GET", '/home', '#main')
-    });
 }
 
+window.auth = auth
+window.onAuthStateChanged = onAuthStateChanged
 window.signIn = signIn
 window.signOff = signOff
-window.auth = auth

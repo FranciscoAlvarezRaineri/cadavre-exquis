@@ -3,8 +3,11 @@ package controllers
 import (
 	"cadavre-exquis/ces"
 	email_service "cadavre-exquis/email"
+	"cadavre-exquis/models"
 	"cadavre-exquis/users"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -107,14 +110,29 @@ func NewCEForm(c *gin.Context) {
 }
 
 func GetRandomCE(c *gin.Context) {
-	uid, _ := c.Get("uid")
-	id := c.Query("active_ce")
+	uid := c.GetString("uid")
+	id := c.GetHeader("ActiveCE")
 
-	ce, err := ces.GetRandomCE(uid.(string), id)
-	if err != nil {
-		c.Set("templ", "error.gohtml")
-		c.AbortWithError(http.StatusNotFound, err)
-		return
+	log.Printf("activece: %s", c.GetHeader("ActiveCE"))
+	log.Printf("rerender: %v", c.GetHeader("ReRender"))
+
+	ce := &models.CE{}
+	err := errors.New("")
+
+	if c.GetHeader("ReRender") == "true" {
+		ce, err = ces.GetCE(id)
+		if err != nil {
+			c.Set("templ", "error.gohtml")
+			c.AbortWithError(http.StatusNotFound, err)
+			return
+		}
+	} else {
+		ce, err = ces.GetRandomCE(uid, id)
+		if err != nil {
+			c.Set("templ", "error.gohtml")
+			c.AbortWithError(http.StatusNotFound, err)
+			return
+		}
 	}
 
 	last_contribution := ces.LastContribution(ce)
