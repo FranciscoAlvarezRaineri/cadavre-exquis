@@ -2,7 +2,7 @@
     <button
       hx-get="/newce"
       hx-target="#main" 
-      hx-headers='{"Authorization": "{{ .Auth }}"}'
+      hx-headers='{"Authorization": "{{ .Authorization }}"}'
       hx-push-url="true"
       class="my-2"
     >
@@ -11,7 +11,7 @@
     <button
       hx-get="/home"
       hx-target="#main"
-      hx-headers='{"Authorization": "{{ .Auth }}"}'
+      hx-headers='{"Authorization": "{{ .Authorization }}"}'
       hx-push-url="true"
       class="my-2"
     >
@@ -20,7 +20,7 @@
     <button
       hx-get="/user"
       hx-target="#main"
-      hx-headers='{"Authorization": "{{ .Auth }}"}'
+      hx-headers='{"Authorization": "{{ .Authorization }}"}'
       hx-push-url="true"
       class="my-2"
     >

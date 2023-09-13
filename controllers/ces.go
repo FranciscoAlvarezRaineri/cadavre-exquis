@@ -111,15 +111,15 @@ func NewCEForm(c *gin.Context) {
 
 func GetRandomCE(c *gin.Context) {
 	uid := c.GetString("uid")
-	id := c.GetHeader("ActiveCE")
+	id := c.GetHeader("ce-active")
 
-	log.Printf("activece: %s", c.GetHeader("ActiveCE"))
-	log.Printf("rerender: %v", c.GetHeader("ReRender"))
+	log.Printf("ce-active: %s", c.GetHeader("ce-active"))
+	log.Printf("ce-Rerender: %v", c.GetHeader("ce-Rerender"))
 
 	ce := &models.CE{}
 	err := errors.New("")
 
-	if c.GetHeader("ReRender") == "true" {
+	if c.GetHeader("Ce-Rerender") == "true" {
 		ce, err = ces.GetCE(id)
 		if err != nil {
 			c.Set("templ", "error.gohtml")

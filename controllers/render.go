@@ -7,12 +7,20 @@ import (
 )
 
 type Result struct {
-	Env   string
-	Main  string
-	Msg   string
-	Data  interface{}
-	Error error
-	Auth  string
+	Env     string
+	Main    string
+	Msg     string
+	Authorization     string
+	Headers Headers
+	Data    interface{}
+	Error   error
+}
+
+type Headers struct {
+	
+	Value    string
+	Active   string
+	ReRender string
 }
 
 func RespondJSON(c *gin.Context) {
@@ -42,7 +50,10 @@ func RenderHTML(c *gin.Context) {
 	result.Env = os.Getenv("ENV")
 	result.Main = main
 	result.Msg = c.GetString("msg")
-	result.Auth = c.GetHeader("Authorization")
+	result.Authorization = c.GetHeader("Authorization")
+	result.Headers.Active = c.GetHeader("Ce-Active")
+	result.Headers.Value = c.GetHeader("Ce-Value")
+	result.Headers.ReRender = c.GetHeader("Ce-Rerender")
 	result.Error = c.Errors.Last()
 
 	data, _ := c.Get("data")

@@ -7,9 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
   {{- end}}
   <script src="/public/htmx.min.js"></script>
-  <script type="module">
+  <script>
     let value = ""
-
+    let active = "{{ .Data.id }}"
+  </script>
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
 
     import {
@@ -34,7 +36,12 @@
     const auth = getAuth(app);
 
     onAuthStateChanged(auth, (user) => {
-      if (user) htmx.ajax("GET", '/home', { target: '#main', headers: { "Authorization": user.accessToken, "ActiveCE": "{{ .Data.id }}", "ReRender": true } })
+        const pathname = window.location.pathname;
+      if (user) {
+        htmx.ajax("GET", pathname, { target: '#main', headers: { "Authorization": user.accessToken, "ce-active": active, "ce-rerender": true } })
+      } else {
+        htmx.ajax("GET", pathname, { target: '#main', headers: { "Authorization": "", "ce-active": active, "ce-rerender": false } })
+      }
     });
 
     function signIn(email, password) {
