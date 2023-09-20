@@ -2,63 +2,16 @@
   <title>cadavre exquis</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="/public/index.css" type="text/css" rel="stylesheet" />
-  <link href="/public/build.css" type="text/css" rel="stylesheet" />
   {{if (eq .Env "dev")}}
     <script src="https://cdn.tailwindcss.com"></script>
+  {{else}}
+    <link href="/public/build.css" type="text/css" rel="stylesheet" />
   {{- end}}
   <script src="/public/htmx.min.js"></script>
   <script>
     let value = ""
     let active = "{{ .Data.id }}"
   </script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCYMDy_Rf1o82MmWVyI0p0fRwyJ2w2dcTs",
-      authDomain: "cadavre-exquis-9c7af.firebaseapp.com",
-      projectId: "cadavre-exquis-9c7af",
-      storageBucket: "cadavre-exquis-9c7af.appspot.com",
-      messagingSenderId: "950495760420",
-      appId: "1:950495760420:web:57784044dd9be8f95548b1",
-      measurementId: "G-80DH0CRH6R"
-    }
-
-    const app = initializeApp(firebaseConfig);
-
-    const auth = getAuth(app);
-
-    onAuthStateChanged(auth, (user) => {
-        const pathname = window.location.pathname;
-      if (user) {
-        htmx.ajax("GET", pathname, { target: '#main', headers: { "Authorization": user.accessToken, "ce-active": active, "ce-rerender": true } })
-      } else {
-        htmx.ajax("GET", pathname, { target: '#main', headers: { "Authorization": "", "ce-active": active, "ce-rerender": false } })
-      }
-    });
-
-    function signIn(email, password) {
-      signInWithEmailAndPassword(auth, email, password)
-        .catch((error) => {
-          document.getElementById("msg").innerText = "invalid credentials, please try again"
-          document.getElementById("email").value = ""
-          document.getElementById("password").value = ""
-        });
-    }
-
-    function signOff() {
-      signOut(auth)
-    }
-
-    window.auth = auth
-    window.signIn = signIn
-    window.signOff = signOff
-  </script>
+  <script type="module" src="/public/cookies.js"></script>
+  <script type="module" src="/public/firebase.js"></script>
 </head>

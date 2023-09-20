@@ -5,10 +5,9 @@ import (
 	email_service "cadavre-exquis/email"
 	"cadavre-exquis/models"
 	"cadavre-exquis/users"
-	"errors"
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -111,15 +110,15 @@ func NewCEForm(c *gin.Context) {
 
 func GetRandomCE(c *gin.Context) {
 	uid := c.GetString("uid")
-	id := c.GetHeader("ce-active")
-
-	log.Printf("ce-active: %s", c.GetHeader("ce-active"))
-	log.Printf("ce-Rerender: %v", c.GetHeader("ce-Rerender"))
+	id, err := c.Cookie("active_ce")
+	if err != nil {
+		id = ""
+	}
+	rerender := c.Query("rerender")
 
 	ce := &models.CE{}
-	err := errors.New("")
 
-	if c.GetHeader("Ce-Rerender") == "true" {
+	if rerender == "true" && id != "" {
 		ce, err = ces.GetCE(id)
 		if err != nil {
 			c.Set("templ", "error.gohtml")
@@ -150,7 +149,7 @@ func GetRandomCE(c *gin.Context) {
 	c.Set("data", data)
 
 	c.SetSameSite(http.SameSiteStrictMode)
-	c.SetCookie("active_ce", ce.ID, 3600*24, "/", "127.0.0.1", false, true)
+	c.SetCookie("active_ce", ce.ID, 7*24*60*60*1000, "/", os.Getenv("HOST"), false, true)
 
 	c.Next()
 }
@@ -175,7 +174,7 @@ func ContributeToCE(c *gin.Context) {
 	}
 
 	if len(c.Errors.Errors()) != 0 {
-		c.Set("templ", "error.gohtml")
+		c.Set("main", "error.gohtml")
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -185,7 +184,7 @@ func ContributeToCE(c *gin.Context) {
 
 	success, err := ces.UpdateCE(id, closed, reveal_amount, uid, userName, text)
 	if err != nil || !success {
-		c.Set("templ", "error.gohtml")
+		c.Set("main", "error.gohtml")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
@@ -198,13 +197,13 @@ func ContributeToCE(c *gin.Context) {
 
 	successUser, err := users.ContributedTo(uid, ce)
 	if err != nil || !successUser {
-		c.Set("templ", "error.gohtml")
+		c.Set("main", "error.gohtml")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	c.Status(http.StatusCreated)
-	c.Set("templ", "contribution_success.gohtml")
+	c.Set("main", "contribution_success.gohtml")
 
 	if closed {
 		texts := ces.GetFullText(ce.Contributions)
@@ -212,7 +211,7 @@ func ContributeToCE(c *gin.Context) {
 		email := c.GetString("email")
 		email_service.SendClosedEmail(email, userName, ce.ID, ce.Title)
 
-		c.Set("templ", "ce.gohtml")
+		c.Set("main", "ce.gohtml")
 		c.Set("data", gin.H{"texts": texts})
 	}
 

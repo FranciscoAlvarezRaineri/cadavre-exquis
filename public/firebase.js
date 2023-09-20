@@ -3,8 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebas
 import {
   getAuth,
   signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -23,6 +22,12 @@ const auth = getAuth(app);
 
 function signIn(email, password) {
   signInWithEmailAndPassword(auth, email, password)
+    .then(async (userCredential) => {
+      const user = userCredential.user;
+      const token = await user.getIdToken()
+      setCookie("userToken", token, 7)
+      htmx.ajax("GET", "/home?rerender=true", '#main')
+    })
     .catch((error) => {
       document.getElementById("msg").innerText = "invalid credentials, please try again"
       document.getElementById("email").value = ""
@@ -35,6 +40,5 @@ function signOff() {
 }
 
 window.auth = auth
-window.onAuthStateChanged = onAuthStateChanged
 window.signIn = signIn
 window.signOff = signOff

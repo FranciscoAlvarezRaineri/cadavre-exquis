@@ -5,6 +5,8 @@
   <form
     class="fade-down-1 flex flex-col justify-center w-full"
     id="form"
+    hx-put="/ces/{{ .Data.id }}?reveal_amount={{ .Data.reveal_amount }}&last_contribution={{ .Data.last_contribution }}"
+    hx-target="#main"
   >
     <input
       type="text"
@@ -32,12 +34,10 @@
     class="fade-down-4 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-600"
     hx-get="/home?active_ce={{ .Data.id }}"
     hx-target="#main"
-    hx-headers='{"Authorization": "{{ .Authorization }}"}'
     id="change">
     change
   </button>
-  <script defer>
-    active = "{{ .Data.id }}"
+  <script>
     contribution = document.getElementById("contribution");
 
     contribution.value = value;
@@ -58,25 +58,6 @@
 
     change.addEventListener("click", () => {
       value = ""
-    })
-
-    form = document.getElementById("form");
-
-    form.addEventListener("submit", (event) => {
-      event.preventDefault()
-      const user = auth.currentUser;
-      if (user) {
-        htmx.ajax(
-          'PUT',
-          "/ces/{{ .Data.id }}?reveal_amount={{ .Data.reveal_amount }}&last_contribution={{ .Data.last_contribution }}",
-          { target: '#main', headers: { "Authorization": user.accessToken } })
-          value = ""
-      } else {
-        htmx.ajax(
-          'GET',
-          "/signin",
-          { target: '#main', headers: { "Authorization": "", "ce-active": "{{ .Data.id }}", "ce-Rerender": true } })
-      }
     })
   </script>
 </div>

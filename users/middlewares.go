@@ -8,8 +8,9 @@ import (
 )
 
 func AuthCheck(c *gin.Context) {
-	idToken := c.GetHeader("Authorization")
-	if idToken == "" {
+	idToken, err := c.Cookie("userToken")
+	if err != nil {
+		c.Error(err)
 		c.Set("uid", "")
 		c.Next()
 		return

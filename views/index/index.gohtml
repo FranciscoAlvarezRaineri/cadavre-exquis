@@ -5,6 +5,8 @@
     <main id="main" class="mx-auto">
       {{if (eq .Main "ce.gohtml")}}
         {{template "ce.gohtml" .}}
+      {{else if (eq .Main "contribution_success.gohtml")}}
+        {{template "contribution_success.gohtml" .}}
       {{else if (eq .Main "error.gohtml")}}
         {{template "error.gohtml" .}}
       {{else if (eq .Main "home.gohtml")}}
