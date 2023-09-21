@@ -67,7 +67,7 @@ func getRandomPublicIdleNotIDCE(uid string, id string) (*models.CE, error) {
 		Value:    false,
 	}
 
-	dsnaps, err := firestore.GetAll2Where("ces", where1, where2, id)
+	dsnaps, err := firestore.GetAll2Where("ces", where1, where2)
 	if err != nil {
 		return nil, err
 	}

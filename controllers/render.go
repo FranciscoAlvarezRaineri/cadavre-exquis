@@ -7,11 +7,11 @@ import (
 )
 
 type Result struct {
-	Env   string
-	Main  string
-	Msg   string
-	Data  interface{}
-	Error error
+	Env     string
+	Main    string
+	Msg     string
+	Data    interface{}
+	Error   error
 }
 
 func RespondJSON(c *gin.Context) {

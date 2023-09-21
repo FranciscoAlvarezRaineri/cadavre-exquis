@@ -22,11 +22,11 @@ const auth = getAuth(app);
 
 function signIn(email, password) {
   signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
+    .then(async (userCredential) => {
       const user = userCredential.user;
-      document.cookie = `accessToken=${user.accessToken}`;
-
-      htmx.ajax("GET", '/home', '#main')
+      const token = await user.getIdToken()
+      setCookie("userToken", token, 7)
+      htmx.ajax("GET", "/home?rerender=true", '#main')
     })
     .catch((error) => {
       document.getElementById("msg").innerText = "invalid credentials, please try again"
@@ -37,14 +37,8 @@ function signIn(email, password) {
 
 function signOff() {
   signOut(auth)
-    .then((userCredential) => {
-      document.cookie = `accessToken=`;
-      htmx.ajax("GET", '/home', '#main')
-    })
-    .catch((error) => {
-      htmx.ajax("GET", '/home', '#main')
-    });
 }
 
+window.auth = auth
 window.signIn = signIn
 window.signOff = signOff

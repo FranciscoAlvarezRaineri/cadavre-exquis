@@ -81,7 +81,7 @@ type Where struct {
 	Value    any
 }
 
-func GetAll2Where(collection string, where1 Where, where2 Where, id string) ([]*firestore.DocumentSnapshot, error) {
+func GetAll2Where(collection string, where1 Where, where2 Where) ([]*firestore.DocumentSnapshot, error) {
 	dsnaps, err := Client.Collection(collection).Where(where1.Key, where1.Operator, where1.Value).Where(where2.Key, where2.Operator, where2.Value).Documents(context.Context).GetAll()
 	if err != nil {
 		return nil, err

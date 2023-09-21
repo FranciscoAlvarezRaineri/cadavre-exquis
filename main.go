@@ -4,6 +4,7 @@ import (
 	"cadavre-exquis/controllers"
 	"cadavre-exquis/firebase/firestore"
 	"cadavre-exquis/users"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -43,6 +44,7 @@ func main() {
 
 	router.GET("/", controllers.GetRandomCE)
 	router.GET("/home", controllers.GetRandomCE)
+	router.GET("/landing", controllers.GetRandomCE)
 	router.GET("/user", controllers.GetUser)
 	router.GET("/users/:uid/confirm/:code", controllers.ConfirmEmail)
 	router.POST("/user", controllers.CreateUser)
@@ -58,5 +60,6 @@ func main() {
 	router.GET("/ces/:id", controllers.GetCE)
 	router.PUT("/ces/:id", controllers.ContributeToCE)
 
-	router.Run(os.Getenv("HOST_PORT"))
+	HOST_PORT := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
+	router.Run(HOST_PORT)
 }

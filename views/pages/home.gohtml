@@ -1,8 +1,11 @@
+{{template "menu.gohtml" . }}
+<script></script>
 <div class="flex flex-col items-center mx-5" id="content">
   <p class="fade-down-0 mt-5">... {{ .Data.reveal }}</p>
   <form
-    hx-put="/ces/{{ .Data.id }}?reveal_amount={{ .Data.reveal_amount }}&last_contribution={{ .Data.last_contribution }}"
     class="fade-down-1 flex flex-col justify-center w-full"
+    id="form"
+    hx-put="/ces/{{ .Data.id }}?reveal_amount={{ .Data.reveal_amount }}&last_contribution={{ .Data.last_contribution }}"
     hx-target="#main"
   >
     <input
@@ -20,17 +23,41 @@
       <p class="mb-1">you can read the complete text if you contribute</p>
     </div>
     {{- end}}
-    <button class="fade-down-3 my-3 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-500" type="submit">submit</button>
+    <button
+      class="fade-down-3 my-3 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-500"
+      type="submit"
+      id="submit">
+      submit
+    </button>
   </form>
-  <button class="fade-down-4 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-600" hx-get="/home" hx-target="#main">change</button>
+  <button
+    class="fade-down-4 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-600"
+    hx-get="/home?active_ce={{ .Data.id }}"
+    hx-target="#main"
+    id="change">
+    change
+  </button>
   <script>
     contribution = document.getElementById("contribution");
-    contribution.addEventListener("input", (event) => {
+
+    contribution.value = value;
+
+    contribution.addEventListener("change", () => {
+      value = contribution.value
+    });
+
+    contribution.addEventListener("input", () => {
     if (contribution.value.split(" ").length < Number("{{ .Data.words_min}}")) {
-      contribution.setCustomValidity("Please, writte at least {{ .Data.words_min}} words.");
+      contribution.setCustomValidity("Please, write at least {{ .Data.words_min}} words.");
     } else {
       contribution.setCustomValidity("");
     }
     });
+
+    change = document.getElementById("change");
+
+    change.addEventListener("click", () => {
+      value = ""
+    })
   </script>
 </div>
