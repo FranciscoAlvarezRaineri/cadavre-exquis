@@ -19,7 +19,6 @@ type CE struct {
 	ID            string         `firestore:"-"`
 	Title         string         `firestore:"title"`
 	Contributions []Contribution `firestore:"contributions"`
-	Contributors  []string       `firestore:"contributors"`
 	Length        int            `firestore:"length"`
 	CharactersMax int            `firestore:"characters_max"`
 	WordsMin      int            `firestore:"words_min"`

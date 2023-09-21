@@ -37,6 +37,10 @@ function signIn(email, password) {
 
 function signOff() {
   signOut(auth)
+    .then(() => {
+      Cookies.remove('userToken')
+      htmx.ajax("GET", "/home?rerender=true", '#main')
+    })
 }
 
 window.auth = auth

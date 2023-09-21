@@ -72,16 +72,6 @@ func GetRandomCE(uid string, id string) (*models.CE, error) {
 		return nil, err
 	}
 
-	/*
-		if uid != "" {
-			log.Printf("uid: %s", uid)
-			next := checkContributor(uid, ce.Contributions)
-			if next {
-				GetRandomCE(uid)
-			}
-		}
-	*/
-
 	return ce, nil
 }
 

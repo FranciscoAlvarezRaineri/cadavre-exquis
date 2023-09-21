@@ -134,6 +134,8 @@ func GetRandomCE(c *gin.Context) {
 		}
 	}
 
+	
+
 	last_contribution := ces.LastContribution(ce)
 	data := gin.H{
 		"id":                ce.ID,
@@ -197,13 +199,13 @@ func ContributeToCE(c *gin.Context) {
 
 	successUser, err := users.ContributedTo(uid, ce)
 	if err != nil || !successUser {
-		c.Set("main", "error.gohtml")
+		c.Set("templ", "error.gohtml")
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	c.Status(http.StatusCreated)
-	c.Set("main", "contribution_success.gohtml")
+	c.Set("templ", "contribution_success.gohtml")
 
 	if closed {
 		texts := ces.GetFullText(ce.Contributions)
@@ -211,7 +213,7 @@ func ContributeToCE(c *gin.Context) {
 		email := c.GetString("email")
 		email_service.SendClosedEmail(email, userName, ce.ID, ce.Title)
 
-		c.Set("main", "ce.gohtml")
+		c.Set("templ", "ce.gohtml")
 		c.Set("data", gin.H{"texts": texts})
 	}
 
