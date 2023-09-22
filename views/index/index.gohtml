@@ -20,6 +20,8 @@
         {{template "signup.gohtml" .}}
       {{else if (eq .Main "user.gohtml")}}
         {{template "user.gohtml" .}}
+      {{else}}
+        {{template "error.gohtml" .}}
       {{- end}}
     </main>
     {{template "footer.gohtml" .}}

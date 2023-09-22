@@ -4,23 +4,23 @@ html {
 
 body {
     min-height: 100%;
-    font-size: 3vmin;
-}
-
-h1 {
-    font-size: 5vmin;
-}
-
-h3 {
-    font-size: 4vmin;
-}
-
-p, li, label, h3, button, input {
     text-align: center
 }
 
+h1 {
+    font-size: 8vmin;
+}
+
+h3 {
+    font-size: 5vmin;
+}
+
+p {
+    font-size: 3vmin;
+}
+
 footer {
-    font-size: 2vmin;
+    font-size: 3vmin;
 }
 
 .fade-down-0 {

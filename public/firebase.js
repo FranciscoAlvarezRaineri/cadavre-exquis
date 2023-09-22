@@ -26,7 +26,7 @@ function signIn(email, password) {
       const user = userCredential.user;
       const token = await user.getIdToken()
       Cookies.set("userToken", token, { expires: 14 })
-      htmx.ajax("GET", "/home?rerender=true", '#main')
+      window.location.assign("/home?rerender=true")
     })
     .catch((err) => {
       console.log(err)

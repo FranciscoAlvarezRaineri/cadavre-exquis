@@ -1,18 +1,29 @@
 <div class="flex flex-col justify-center">
-  <p class="my-3">{{ .Data.user_name }}</p>
+  <h3 class="mt-5 mb-3">{{ .Data.user_name }}</h3>
   <p class="mb-2">{{ .Msg }}</p>
-  <h3 class="mb-2 text-lg text-center">completed</h3>
-  <ul class="flex flex-col justify-center drop-list">
-    {{range .Data.ces}}
+  <menu class="flex items-center justify-around">
+    <h3 class="mb-2 underline fade-down-0" hx-get="/user?tab=completed" hx-target="#ces-list" hx-push-url="true">
+      completed
+    </h3>
+    <h3 class="mb-2 underline fade-down-0" hx-get="/user?tab=created" hx-target="#ces-list" hx-push-url="true">
+      created
+    </h3>
+  </menu>
+  <ul class="flex flex-col justify-center drop-list" id="ces-list">
+  {{ range .Data.ces }}
     <li hx-get="/ces/{{ .ID }}" hx-target="#main" hx-push-url="true">
-      <p
-        class="my-0.5 transition ease-in-out duration-300 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] hover:cursor-pointer"
-      >
+      <p class="my-0.5 transition ease-in-out duration-500 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] hover:cursor-pointer">
         {{ .Title }}
       </p>
     </li>
-    {{end}}
+  {{ else }}
+    <p class="my-0.5 fade-down-1">
+      When at least one entry you contributed to gets completed,
+    </p>
+    <p class="my-0.5 fade-down-2">
+      you will be able to see it here.
+    </p>
+  {{ end }}
   </ul>
-  <button class="my-4" onclick="signOff()">sign out</button>
-  <script type="module" src="/public/firebase.js"></script>
+  <button class="mt-8 hover:drop-shadow-[0_0px_2px_rgba(235,235,235,0.5)] transition ease-in-out duration-500" onclick="signOff()">sign out</button>
 </div>

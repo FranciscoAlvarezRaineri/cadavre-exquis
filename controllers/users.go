@@ -2,6 +2,7 @@ package controllers
 
 import (
 	email_service "cadavre-exquis/email"
+	"cadavre-exquis/models"
 	"cadavre-exquis/users"
 	"net/http"
 
@@ -27,7 +28,15 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
-	contributions := users.GetClosedContributions(user.Ces)
+	contributions := &[]models.CERef{}
+
+	tab := c.Query("tab")
+	if tab == "" {
+		tab = "completed"
+		contributions = users.GetClosedContributions(user.Ces)
+	} else if tab == "created" {
+		contributions = users.GetCreatedContributions(user.Created)
+	}
 
 	data := gin.H{
 		"user_name": user.UserName,

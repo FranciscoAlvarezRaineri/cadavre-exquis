@@ -80,3 +80,16 @@ func GetClosedContributions(ces map[string]models.CERef) *[]models.CERef {
 
 	return &contributions
 }
+
+func GetCreatedContributions(ces map[string]models.CERef) *[]models.CERef {
+	var contributions []models.CERef
+	for id, ce := range ces {
+		if ce.Closed {
+			contribution := ce
+			contribution.ID = id
+			contributions = append(contributions, contribution)
+		}
+	}
+
+	return &contributions
+}
