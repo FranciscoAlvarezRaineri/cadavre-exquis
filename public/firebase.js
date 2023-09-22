@@ -25,10 +25,11 @@ function signIn(email, password) {
     .then(async (userCredential) => {
       const user = userCredential.user;
       const token = await user.getIdToken()
-      setCookie("userToken", token, 7)
+      Cookies.set("userToken", token, { expires: 14 })
       htmx.ajax("GET", "/home?rerender=true", '#main')
     })
-    .catch((error) => {
+    .catch((err) => {
+      console.log(err)
       document.getElementById("msg").innerText = "invalid credentials, please try again"
       document.getElementById("email").value = ""
       document.getElementById("password").value = ""
@@ -37,6 +38,10 @@ function signIn(email, password) {
 
 function signOff() {
   signOut(auth)
+    .then(() => {
+      Cookies.remove('userToken')
+      htmx.ajax("GET", "/home?rerender=true", '#main')
+    })
 }
 
 window.auth = auth
